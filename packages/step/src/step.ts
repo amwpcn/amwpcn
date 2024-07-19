@@ -63,8 +63,10 @@ export abstract class Step<C extends IContext = IContext> {
    * create a new step and add it to the before queue with a priority as you need.
    *
    * Usage example: Select something from the database that you need for the executions of the current or children steps
+   *
+   * @param context The shared context object.
    */
-  async prepare(): Promise<void> {}
+  async prepare(context: C): Promise<void> {}
 
   /**
    * This is the only required function for you to implement when you extend the Step class.
@@ -104,6 +106,8 @@ export abstract class Step<C extends IContext = IContext> {
    * Keep this only wrapping up.
    *
    * Usage example: Log information about the step
+   *
+   * @param context The shared context object.
    */
-  async final(): Promise<void> {}
+  async final(context: C): Promise<void> {}
 }
