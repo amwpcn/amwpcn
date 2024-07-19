@@ -12,6 +12,8 @@ export interface IHandlers {
  * @template C - The type of the shared context expected by all the steps.
  */
 export abstract class Step<C extends IContext = IContext> {
+  abstract name: string;
+
   private _before = new PriorityQueue<Step<C>>();
   private _after = new PriorityQueue<Step<C>>();
 

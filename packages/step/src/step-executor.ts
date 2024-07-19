@@ -4,6 +4,12 @@ interface ExecutionGraphOptions {
   enable: boolean;
 }
 
+interface ErrorHandlers {
+  execute?: (error: unknown, stepName: string, stage: 'execute') => void;
+  prepare?: (error: unknown, stepName: string, stage: 'prepare') => void;
+  final?: (error: unknown, stepName: string, stage: 'final') => void;
+}
+
 export class StepExecutor<C extends IContext> {
   private _steps: Step<C>[];
   private _context: C;
@@ -17,7 +23,8 @@ export class StepExecutor<C extends IContext> {
   constructor(
     s: Step<C> | Step<C>[],
     c: C,
-    _executionGraphOptions?: ExecutionGraphOptions,
+    private _errorHandlers?: ErrorHandlers,
+    private _executionGraphOptions?: ExecutionGraphOptions,
   ) {
     this._steps = Array.isArray(s) ? s : [s];
     this._context = c ?? {};
@@ -35,7 +42,17 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Preparations
-    await step.prepare();
+    try {
+      await step.prepare();
+    } catch (error) {
+      if (this._errorHandlers?.prepare) {
+        this._errorHandlers.prepare(error, step.name, 'prepare');
+      } else {
+        this._defaultErrorHandler(error, step.name, 'prepare');
+        // Immediately stop executing the rest of the function
+        return;
+      }
+    }
 
     // Executing before queue recursively
     const before = step.beforeQueue;
@@ -50,7 +67,17 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing the current step
-    await step.execute(this._context, this._handlers);
+    try {
+      await step.execute(this._context, this._handlers);
+    } catch (error) {
+      if (this._errorHandlers?.execute) {
+        this._errorHandlers.execute(error, step.name, 'execute');
+      } else {
+        this._defaultErrorHandler(error, step.name, 'execute');
+        // Immediately stop executing the rest of the function
+        return;
+      }
+    }
 
     // Executing after queue recursively
     const after = step.afterQueue;
@@ -65,6 +92,23 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Wrapping up with final
-    await step.final();
+    try {
+      await step.final();
+    } catch (error) {
+      if (this._errorHandlers?.final) {
+        this._errorHandlers.final(error, step.name, 'final');
+      } else {
+        this._defaultErrorHandler(error, step.name, 'final');
+      }
+    }
+  }
+
+  private _defaultErrorHandler(
+    error: unknown,
+    stepName: string,
+    stage: 'execute' | 'prepare' | 'final',
+  ): void {
+    console.error({ stepName, stage, error });
+    this._handlers.stopImmediate();
   }
 }
