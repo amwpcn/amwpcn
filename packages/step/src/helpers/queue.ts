@@ -43,7 +43,7 @@ export class PriorityQueue<T = any> {
   }
 
   toString(): string {
-    return this._queue.toString();
+    return `[${this._queue.map((i) => `[${i.toString()}]`).join(',')}]`;
   }
 
   private _peak(): [number, T] | undefined {

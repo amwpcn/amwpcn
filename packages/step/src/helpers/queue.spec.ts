@@ -1,12 +1,28 @@
 import { PriorityQueue } from './queue';
 
 describe('PriorityQueue', () => {
-  // enqueue single item with default priority
+  // should enqueue a single item with default priority when no priority is provided
   it('should enqueue a single item with default priority when no priority is provided', () => {
     const pq = new PriorityQueue<number>();
     pq.enqueue(5);
     expect(pq.size).toBe(1);
     expect(pq.peak()).toBe(5);
+  });
+
+  // should return undefined for peak if no items in the queue
+  it('should return undefined for peak if no items in the queue', () => {
+    const pq = new PriorityQueue<number>();
+    expect(pq.size).toBe(0);
+    expect(pq.peak()).toBeUndefined();
+  });
+
+  // should return string representation of the internal queue array
+  it('should return string representation of the internal queue array', () => {
+    const pq = new PriorityQueue<number>();
+    pq.enqueue(5);
+    pq.enqueue(3, 1);
+    pq.enqueue(1, 2);
+    expect(pq.toString()).toBe('[[2,1],[1,3],[0,5]]');
   });
 
   // dequeue from an empty queue
