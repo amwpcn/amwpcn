@@ -44,21 +44,14 @@ export class PriorityQueue<T = any> {
 
   /**
    * Removes and returns one or more items from the priority queue based on their priority.
-   * If 'inParallel' is true, returns all items with the same highest priority.
-   * If 'inParallel' is false, returns only one item with the highest priority.
    * Throws an error if the queue is empty.
    * Complexity: O(k) - k is the number of items returning
    *
-   * @param inParallel - Indicates whether to dequeue items in parallel (default is true).
-   * @returns The dequeued item or items based on the specified conditions.
+   * @returns The dequeued items
    */
-  dequeue(inParallel: boolean = true): T | T[] {
+  dequeue(): T[] {
     if (this.isEmpty) {
       throw new Error('No elements in the queue!');
-    }
-
-    if (!inParallel) {
-      return this._queue.pop()![1];
     }
 
     const items: T[] = [];

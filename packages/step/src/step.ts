@@ -17,6 +17,14 @@ export abstract class Step<C extends IContext = IContext> {
 
   constructor() {}
 
+  get beforeQueue(): PriorityQueue<Step<C>> {
+    return this._before;
+  }
+
+  get afterQueue(): PriorityQueue<Step<C>> {
+    return this._after;
+  }
+
   /**
    * Enqueues a step or an array of steps before the current step with a specified priority.
    *
@@ -39,24 +47,6 @@ export abstract class Step<C extends IContext = IContext> {
   enqueueAfter(item: Step<C> | Step<C>[], priority: number): this {
     this._after.enqueue(item, priority);
     return this;
-  }
-
-  /**
-   * Dequeues and returns an array of steps with the highest from the priority queue before the current step.
-   *
-   * @returns An array of steps dequeued before the current step.
-   */
-  dequeueBefore(): Step<C>[] {
-    return this._before.dequeue() as Step<C>[];
-  }
-
-  /**
-   * Dequeues and returns an array of steps with the highest priority from the queue after the current step.
-   *
-   * @returns An array of steps dequeued after the current step.
-   */
-  dequeueAfter(): Step<C>[] {
-    return this._after.dequeue() as Step<C>[];
   }
 
   /**

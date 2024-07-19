@@ -56,15 +56,4 @@ describe('PriorityQueue', () => {
     expect(pq.dequeue()).toEqual(['orange']);
     expect(pq.dequeue()).toEqual(expect.arrayContaining(['mango', 'apple']));
   });
-
-  // dequeue items one by one even if they have the same priority
-  it('should dequeue items one by one even if they have the same priority', () => {
-    const pq = new PriorityQueue<string>();
-    pq.enqueue('apple', 2);
-    pq.enqueue('orange', 1);
-    pq.enqueue('mango', 2);
-    expect(pq.size).toBe(3);
-    expect(pq.dequeue(false)).toEqual('orange');
-    expect(pq.dequeue(false)).toMatch(/apple|mango/);
-  });
 });
