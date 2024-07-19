@@ -1,8 +1,9 @@
 {
-    "name": "@amwpcn/step",
+    "name": "@amwpcn/examples",
+    "private": true,
     "scripts": {
         "build": "tsc",
-        "start": "yarn build"
+        "start": "yarn build && node dist/index"
     },
     "devDependencies": {
         "typescript": "^5.5.3"
