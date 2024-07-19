@@ -1,3 +1,3 @@
 export class Queue<T = any> {
-    private _queue: T[] = []
+  private _queue: T[] = [];
 }

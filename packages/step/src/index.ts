@@ -1,1 +1,1 @@
-export { Step } from './step'
+export { Step } from './step';
