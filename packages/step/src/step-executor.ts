@@ -1,17 +1,27 @@
-import { IContext, Step } from './step';
+import { IContext, IHandlers, Step } from './step';
+
+interface ExecutionGraphOptions {
+  test: boolean;
+}
 
 export class StepExecutor<C extends IContext> {
   private _steps: Step<C>[];
+  private _context: C;
+
+  private _stopImmediate: boolean = false;
+  private _handlers: IHandlers = {
+    stopImmediate: () => {
+      this._stopImmediate = true;
+    },
+  };
 
   constructor(
-    _s: Step<C> | Step<C>[],
-    private _context: C,
+    s: Step<C> | Step<C>[],
+    c: C,
+    _executionGraphOptions?: ExecutionGraphOptions,
   ) {
-    if (Array.isArray(_s)) {
-      this._steps = _s;
-    } else {
-      this._steps = [_s];
-    }
+    this._steps = Array.isArray(s) ? s : [s];
+    this._context = c ?? {};
   }
 
   async start(): Promise<void> {
@@ -20,5 +30,7 @@ export class StepExecutor<C extends IContext> {
     }
   }
 
-  private async _start(step: Step<C>): Promise<void> {}
+  private async _start(step: Step<C>): Promise<void> {
+    await step.execute(this._context, this._handlers);
+  }
 }

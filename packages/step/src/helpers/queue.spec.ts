@@ -9,6 +9,13 @@ describe('PriorityQueue', () => {
     expect(pq.peak()).toBe(5);
   });
 
+  // should initialize with the given items to the constructor
+  it('should initialize with the given items to the constructor', () => {
+    const pq = new PriorityQueue<number>([5, 3]);
+    expect(pq.size).toBe(2);
+    expect(pq.dequeue()).toEqual(expect.arrayContaining([5, 3]));
+  });
+
   // should return undefined for peak if no items in the queue
   it('should return undefined for peak if no items in the queue', () => {
     const pq = new PriorityQueue<number>();

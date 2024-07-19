@@ -5,6 +5,12 @@
 export class PriorityQueue<T = any> {
   private _queue: [number, T][] = [];
 
+  constructor(items?: T | T[], p?: number) {
+    if (items) {
+      this.enqueue(items, p);
+    }
+  }
+
   /**
    * Check if the queue is empty.
    */
