@@ -9,12 +9,12 @@ export class PriorityQueue<T = any> {
     return this._queue.length;
   }
 
-  enqueue(item: T | T[], p?: number): void {
+  enqueue(item: T | T[], p: number = 0): void {
     if (!Array.isArray(item)) {
       item = [item];
     }
 
-    this._queue.push(...item.map((i) => [p ?? 0, i] as [number, T]));
+    this._queue.push(...item.map((i) => [p, i] as [number, T]));
     this._queue.sort((a, b) => b[0] - a[0]);
   }
 
