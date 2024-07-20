@@ -1,5 +1,7 @@
 {
   "name": "amwpcn",
+  "version": "0.0.0",
+  "private": true,
   "packageManager": "yarn@4.3.1",
   "workspaces": [
     "packages/*"

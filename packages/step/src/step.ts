@@ -14,10 +14,17 @@ export interface IHandlers {
 export abstract class Step<C extends IContext = IContext> {
   abstract name: string;
 
+  // A unique id for the step. This id has to be unique within the execution context.
+  private _id: string = Math.round(Date.now() * Math.random()).toString();
+
   private _before = new PriorityQueue<Step<C>>();
   private _after = new PriorityQueue<Step<C>>();
 
   constructor() {}
+
+  get id() {
+    return this._id;
+  }
 
   get beforeQueue(): PriorityQueue<Step<C>> {
     return this._before;
@@ -85,10 +92,12 @@ export abstract class Step<C extends IContext = IContext> {
   ): Promise<void | Step<C>[] | Step<C>>;
 
   /**
-   * Performs the rollback operation for the step.
+   * Will perform the rollback operation for the step, if an error occurs during the execution.
+   * If you have custom error handler, by returning true, the `rollback` function can be executed.
+   * If any error occurs during the rollback, it will be immediately thrown.
    *
-   * @param context The same original `context` object that was passed to the execute function.
-   * If you changed anything in the context during the execute, those changes won't appear in here.
+   * @param context Same `context` object that was passed to the execute function will also be passed here.
+   * If you change anything during the execution of the step, those changes will also appear here.
    * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
    * for example `handlers.stopImmediate()` will stop all the executions immediately.
    * @returns A promise that resolves to void, an array of steps, or a single step.

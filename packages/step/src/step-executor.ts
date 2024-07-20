@@ -1,7 +1,8 @@
+import { Graph, GraphNode } from './helpers/graph';
 import { IContext, IHandlers, Step } from './step';
 
 interface ExecutionGraphOptions {
-  enable: boolean;
+  enable?: boolean;
 }
 
 type StepStage = 'execute' | 'prepare' | 'final';
@@ -25,6 +26,7 @@ interface ErrorHandlers {
 export class StepExecutor<C extends IContext> {
   private _steps: Step<C>[];
   private _context: C;
+  private _graph = new Graph();
   private _stopImmediate: boolean = false;
   private _handlers: IHandlers = {
     stopImmediate: () => {
@@ -64,7 +66,9 @@ export class StepExecutor<C extends IContext> {
    * @param step - The step to be executed.
    * @returns A Promise that resolves when the step execution is completed.
    */
-  private async _start(step: Step<C>): Promise<void> {
+  private async _start(step: Step<C>, previous?: Step<C>): Promise<void> {
+    this._updateGraph(step, previous);
+
     // If any step other requested an immediate stop
     if (this._stopImmediate) {
       return;
@@ -83,7 +87,7 @@ export class StepExecutor<C extends IContext> {
     const before = step.beforeQueue;
     while (!before.isEmpty) {
       const steps = before.dequeue();
-      await Promise.all([...steps.map((s) => this._start(s))]);
+      await Promise.all([...steps.map((s) => this._start(s, step))]);
 
       // If any before step of the current step or highest priority step requested an immediate stop
       if (this._stopImmediate) {
@@ -96,6 +100,7 @@ export class StepExecutor<C extends IContext> {
       await step.execute(this._context, this._handlers);
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'execute')) {
+        await step.rollback(this._context, this._handlers);
         return;
       }
     }
@@ -104,7 +109,7 @@ export class StepExecutor<C extends IContext> {
     const after = step.afterQueue;
     while (!after.isEmpty) {
       const steps = after.dequeue();
-      await Promise.all([...steps.map((s) => this._start(s))]);
+      await Promise.all([...steps.map((s) => this._start(s, step))]);
 
       // If any highest priority step requested an immediate stop
       if (this._stopImmediate) {
@@ -120,6 +125,19 @@ export class StepExecutor<C extends IContext> {
         return;
       }
     }
+  }
+
+  private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
+    const currentNode = this._graph.addNode({
+      id: current.id,
+      label: current.name,
+    });
+
+    if (previous) {
+      this._graph.addEdge({ from: previous.id, to: current.id });
+    }
+
+    return currentNode;
   }
 
   private _defaultErrorHandler(

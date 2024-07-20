@@ -1,5 +1,6 @@
 {
   "name": "@amwpcn/examples",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "tsc",

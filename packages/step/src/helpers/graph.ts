@@ -1,4 +1,4 @@
-interface Node {
+export interface GraphNode {
   id: string;
   label: string;
   title?: string;
@@ -6,26 +6,30 @@ interface Node {
   shape?: string;
 }
 
-interface Edge {
+export interface GraphEdge {
   from: string;
   to: string;
-  label: string;
+  label?: string;
   title?: string;
   color?: string;
   arrows?: 'from' | 'to' | 'middle';
 }
 
 export class Graph {
-  private _nodes: Node[] = [];
-  private _edges: Edge[] = [];
+  private _nodes: GraphNode[] = [];
+  private _edges: GraphEdge[] = [];
 
-  addNode(node: Omit<Node, 'id'>) {
-    const fullNode = { id: '', ...node };
-    this._nodes.push(fullNode);
-    return fullNode;
+  addNode(node: GraphNode) {
+    const existingNode = this._nodes.find((n) => n.id === node.id);
+    if (existingNode) {
+      return existingNode;
+    }
+
+    this._nodes.push(node);
+    return node;
   }
 
-  addEdge(edge: Edge) {
+  addEdge(edge: GraphEdge) {
     this._edges.push(edge);
     return edge;
   }
