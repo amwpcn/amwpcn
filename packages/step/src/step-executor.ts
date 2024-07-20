@@ -38,7 +38,7 @@ export class StepExecutor<C extends IContext> {
     s: Step<C> | Step<C>[],
     c: C,
     private _errorHandlers?: ErrorHandlers,
-    private _executionGraphOptions?: ExecutionGraphOptions,
+    private _graphOptions?: ExecutionGraphOptions,
   ) {
     this._steps = Array.isArray(s) ? s : [s];
     this._context = c ?? {};
@@ -67,7 +67,9 @@ export class StepExecutor<C extends IContext> {
    * @returns A Promise that resolves when the step execution is completed.
    */
   private async _start(step: Step<C>, previous?: Step<C>): Promise<void> {
-    this._updateGraph(step, previous);
+    // Creates a new node for the current step and links it to the previous one
+    const graphNode = this._updateGraph(step, previous);
+    console.log(graphNode);
 
     // If any step other requested an immediate stop
     if (this._stopImmediate) {
@@ -88,6 +90,9 @@ export class StepExecutor<C extends IContext> {
     while (!before.isEmpty) {
       const steps = before.dequeue();
       await Promise.all([...steps.map((s) => this._start(s, step))]);
+
+      // Before executions always comes back to the current step, hence we add the coming back edge to  the graph
+      if (this._graphOptions) for (const s of steps) this._updateGraph(step, s);
 
       // If any before step of the current step or highest priority step requested an immediate stop
       if (this._stopImmediate) {
@@ -128,8 +133,6 @@ export class StepExecutor<C extends IContext> {
   }
 
   private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
-    console.log(this._executionGraphOptions);
-
     const currentNode = this._graph.addNode({
       id: current.id,
       label: current.name,

@@ -1,6 +1,7 @@
 {
   "name": "@amwpcn/step",
   "version": "0.0.0",
+  "main": "dist/index",
   "scripts": {
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
@@ -9,6 +10,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/node": "^20.14.11",
     "jest": "^29.7.0",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.2.3",
