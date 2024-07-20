@@ -1,0 +1,24 @@
+{
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "{projectRoot}/dist"
+      ]
+    },
+    "start": {
+      "dependsOn": [
+        "^start"
+      ]
+    },
+    "test": {
+      "cache": true,
+      "outputs": [
+        "{projectRoot}/../../coverage"
+      ]
+    }
+  }
+}

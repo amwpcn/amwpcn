@@ -18,3 +18,4 @@ node_modules
 # tests/builds
 coverage
 **/dist/**
+.nx/**

@@ -19,12 +19,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@amwpcn/examples@workspace:packages/examples"
   dependencies:
+    "@amwpcn/step": "workspace:^"
     rimraf: "npm:^6.0.1"
     typescript: "npm:^5.5.3"
   languageName: unknown
   linkType: soft
 
-"@amwpcn/step@workspace:packages/step":
+"@amwpcn/step@workspace:^, @amwpcn/step@workspace:packages/step":
   version: 0.0.0-use.local
   resolution: "@amwpcn/step@workspace:packages/step"
   dependencies:
