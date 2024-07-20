@@ -15,5 +15,6 @@
 # modules
 node_modules
 
-# tests
+# tests/builds
 coverage
+**/dist/**

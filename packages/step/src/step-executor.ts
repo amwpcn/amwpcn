@@ -128,6 +128,8 @@ export class StepExecutor<C extends IContext> {
   }
 
   private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
+    console.log(this._executionGraphOptions);
+
     const currentNode = this._graph.addNode({
       id: current.id,
       label: current.name,
