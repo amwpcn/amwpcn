@@ -1,12 +1,13 @@
-import { Step } from '@amwpcn/step';
-import { IContext, IHandlers } from '@amwpcn/step/dist/step';
+import { IContext, IHandlers, Step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
 
-export class ImportDocumentStep extends Step {
+interface ImportDocumentContext extends IContext {}
+
+export class ImportDocumentStep extends Step<ImportDocumentContext> {
   name: string = 'ImportDocument';
 
   async execute(
-    context: IContext,
+    context: ImportDocumentContext,
     handlers: IHandlers,
   ): Promise<void | Step<IContext>[] | Step<IContext>> {
     console.log('BEGIN: Importing document');
