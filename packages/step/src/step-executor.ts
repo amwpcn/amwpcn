@@ -21,9 +21,9 @@ interface Options {
  * Stops execution if an immediate stop is requested or an error occurs.
  *
  * @param s - The step or array of steps to be executed.
- * @param c - The context for the execution.
- * @param _errorHandlers - (Optional) Error handlers for handling errors during execution.
- * @param _graphOptions - (Optional) Options for the execution graph.
+ * @param c - The context object for the steps.
+ * @param _errorHandlers - (Optional) The error handlers for handling errors during step execution.
+ * @param _options - (Optional) The options for configuring the StepExecutor.
  */
 export class StepExecutor<C extends IContext> {
   private _steps: Step<C>[];
@@ -74,7 +74,9 @@ export class StepExecutor<C extends IContext> {
    * Stops execution if an immediate stop is requested or an error occurs.
    *
    * @param step - The step to be executed.
-   * @returns A Promise that resolves when the step execution is completed.
+   * @param previous - The previous step that leads to the current step.
+   * @param ancestors - An array of step names representing the ancestors of the current step.
+   * @returns A Promise that resolves when the step and its related steps are executed.
    */
   private async _start(
     step: Step<C>,
