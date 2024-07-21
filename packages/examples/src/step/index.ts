@@ -1,11 +1,8 @@
 import { createExecutor } from '@amwpcn/step';
-import { importDocument } from './custom-steps';
+import { importDocument, updateDocumentCount } from './custom-steps';
 
 async function main() {
-  const steps = importDocument()
-    .enqueueBefore(importDocument(), 0)
-    .enqueueBefore(importDocument(), 1)
-    .enqueueAfter(importDocument(), 0);
+  const steps = importDocument().enqueueAfter(updateDocumentCount(), 0);
   const executor = createExecutor(steps, {}, undefined, {
     graph: { enable: true },
     maxRepetitions: 2,
