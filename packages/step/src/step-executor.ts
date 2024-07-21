@@ -1,5 +1,6 @@
 import { Graph, GraphNode, GraphOptions } from './helpers';
-import { IContext, IHandlers, Step } from './step';
+import { IContext, ImmutableContext } from './immutable-context';
+import { IHandlers, Step } from './step';
 
 type StepStage = 'execute' | 'prepare' | 'final';
 type ErrorHandler = (error: unknown, stepName: string) => boolean;
@@ -27,14 +28,17 @@ interface Options {
  */
 export class StepExecutor<C extends IContext> {
   private _steps: Step<C>[];
-  private _context: C;
+  private _context: ImmutableContext<C>;
   private _maxRepetitions: number;
   private _graph: Graph;
 
   private _stopImmediate: boolean = false;
-  private _handlers: IHandlers = {
+  private _handlers: IHandlers<C> = {
     stopImmediate: () => {
       this._stopImmediate = true;
+    },
+    contextUpdater: (updater) => {
+      this._context = this._context.update(updater);
     },
   };
 
@@ -45,7 +49,7 @@ export class StepExecutor<C extends IContext> {
     private _options?: Options,
   ) {
     this._steps = Array.isArray(s) ? s : [s];
-    this._context = c ?? {};
+    this._context = new ImmutableContext(c);
     this._maxRepetitions = _options?.maxRepetitions ?? 10;
     this._graph = new Graph(_options?.graph);
   }
@@ -83,6 +87,7 @@ export class StepExecutor<C extends IContext> {
     previous?: Step<C>,
     ancestors?: string[],
   ): Promise<void> {
+    // Validate circular dependency
     const currentAncestors = ancestors ? [...ancestors, step.name] : [];
     this._checkRepetitions(currentAncestors, step.name);
 
@@ -99,7 +104,7 @@ export class StepExecutor<C extends IContext> {
 
     // Preparations
     try {
-      await step.prepare(this._context);
+      await step.prepare(this._context.get());
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'prepare')) {
         return;
@@ -125,12 +130,12 @@ export class StepExecutor<C extends IContext> {
 
     // Executing the current step
     try {
-      await step.execute(this._context, this._handlers);
+      await step.execute(this._context.get(), this._handlers);
 
       // TODO: Circular dependency check needed here (Probably using a Set<string> of step names)
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'execute')) {
-        await step.rollback(this._context, this._handlers);
+        await step.rollback(this._context.get(), this._handlers);
         return;
       }
     }
@@ -151,7 +156,7 @@ export class StepExecutor<C extends IContext> {
 
     // Wrapping up with final
     try {
-      await step.final(this._context);
+      await step.final(this._context.get());
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'final')) {
         return;

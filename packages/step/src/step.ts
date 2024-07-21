@@ -1,9 +1,9 @@
 import { PriorityQueue } from './helpers';
+import { IContext } from './immutable-context';
 
-export interface IContext {}
-
-export interface IHandlers {
+export interface IHandlers<C extends IContext> {
   stopImmediate: () => void;
+  contextUpdater: (updater: (context: C) => Partial<C>) => void;
 }
 
 /**
@@ -73,7 +73,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @param context The shared context object.
    */
-  async prepare(context: C): Promise<void> {}
+  async prepare(context: Readonly<C>): Promise<void> {}
 
   /**
    * This is the only required function for you to implement when you extend the Step class.
@@ -87,8 +87,8 @@ export abstract class Step<C extends IContext = IContext> {
    * @returns A promise that resolves to void, an array of steps, or a single step.
    */
   abstract execute(
-    context: C,
-    handlers: IHandlers,
+    context: Readonly<C>,
+    handlers: IHandlers<C>,
   ): Promise<void | Step<C>[] | Step<C>>;
 
   /**
@@ -103,8 +103,8 @@ export abstract class Step<C extends IContext = IContext> {
    * @returns A promise that resolves to void, an array of steps, or a single step.
    */
   async rollback(
-    context: C,
-    handlers: IHandlers,
+    context: Readonly<C>,
+    handlers: IHandlers<C>,
   ): Promise<void | Step<C>[] | Step<C>> {}
 
   /**
@@ -118,5 +118,5 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @param context The shared context object.
    */
-  async final(context: C): Promise<void> {}
+  async final(context: Readonly<C>): Promise<void> {}
 }

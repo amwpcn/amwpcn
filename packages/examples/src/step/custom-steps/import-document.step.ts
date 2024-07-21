@@ -7,8 +7,8 @@ export class ImportDocumentStep extends Step<ImportDocumentContext> {
   name: string = 'ImportDocument';
 
   async execute(
-    context: ImportDocumentContext,
-    handlers: IHandlers,
+    context: Readonly<ImportDocumentContext>,
+    handlers: IHandlers<ImportDocumentContext>,
   ): Promise<void | Step<IContext>[] | Step<IContext>> {
     await simulateAsyncTask();
 
