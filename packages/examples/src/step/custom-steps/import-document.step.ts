@@ -10,9 +10,9 @@ export class ImportDocumentStep extends Step<ImportDocumentContext> {
     context: ImportDocumentContext,
     handlers: IHandlers,
   ): Promise<void | Step<IContext>[] | Step<IContext>> {
-    console.log('BEGIN: Importing document');
     await simulateAsyncTask();
-    console.log('END: Importing document');
+
+    // this.enqueueAfter(importDocument(), 0);
   }
 }
 

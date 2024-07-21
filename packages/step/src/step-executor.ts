@@ -167,7 +167,7 @@ export class StepExecutor<C extends IContext> {
     );
 
     if (occurrences > this._maxRepetitions) {
-      new Error(
+      throw new Error(
         `Step "${stepName}" has been repeated ${occurrences} times, which exceeds the maximum allowed repetition of ${this._maxRepetitions}.
         You can increase this amount in StepExecutor options at your own risk of circular dependency.`,
       );
