@@ -1,6 +1,13 @@
 import { Graph, GraphNode, GraphOptions } from './helpers';
 import { IContext, IHandlers, ImmutableContext } from './immutable-context';
-import { Step } from './step';
+import {
+  dequeueAfter,
+  dequeueBefore,
+  isAfterEmpty,
+  isBeforeEmpty,
+  Step,
+  stepId,
+} from './step';
 
 type StepStage = 'execute' | 'prepare' | 'final';
 type ErrorHandler = (error: unknown, stepName: string) => boolean;
@@ -112,8 +119,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing before queue recursively
-    while (!step.isBeforeEmpty) {
-      const steps = step.dequeueBefore();
+    while (!step[isBeforeEmpty]) {
+      const steps = step[dequeueBefore]();
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
@@ -140,8 +147,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing after queue recursively
-    while (!step.isAfterEmpty) {
-      const steps = step.dequeueAfter();
+    while (!step[isAfterEmpty]) {
+      const steps = step[dequeueAfter]();
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
@@ -181,14 +188,14 @@ export class StepExecutor<C extends IContext> {
 
   private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
     const currentNode = this._graph.addNode({
-      id: current.id,
+      id: current[stepId],
       label: current.name,
     });
 
     if (previous) {
       this._graph.addEdge({
-        from: previous.id,
-        to: current.id,
+        from: previous[stepId],
+        to: current[stepId],
         arrows: 'to',
         smooth: { type: 'curvedCW', roundness: 0.2 },
       });

@@ -1,6 +1,12 @@
 import { PriorityQueue } from './helpers';
 import { IContext, IHandlers } from './immutable-context';
 
+export const isBeforeEmpty: unique symbol = Symbol();
+export const isAfterEmpty: unique symbol = Symbol();
+export const dequeueBefore: unique symbol = Symbol();
+export const dequeueAfter: unique symbol = Symbol();
+export const stepId: unique symbol = Symbol();
+
 /**
  * Represents an abstract class for defining a step in a process flow.
  * Manages the order of steps using priority queues for before and after execution.
@@ -19,21 +25,21 @@ export abstract class Step<C extends IContext = IContext> {
 
   constructor() {}
 
-  get id() {
+  get [stepId]() {
     return this._id;
   }
 
   /**
    * This is true if the before queue is empty, otherwise false.
    */
-  get isBeforeEmpty(): boolean {
+  get [isBeforeEmpty](): boolean {
     return this._before.isEmpty;
   }
 
   /**
    * This is true if the after queue is empty, otherwise false.
    */
-  get isAfterEmpty(): boolean {
+  get [isAfterEmpty](): boolean {
     return this._after.isEmpty;
   }
 
@@ -42,7 +48,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @returns An array of steps to be executed before the current step.
    */
-  dequeueBefore(): Step<C>[] {
+  [dequeueBefore](): Step<C>[] {
     return this._before.dequeue();
   }
 
@@ -51,7 +57,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @returns An array of steps to be executed after the current step.
    */
-  dequeueAfter(): Step<C>[] {
+  [dequeueAfter](): Step<C>[] {
     return this._after.dequeue();
   }
 
