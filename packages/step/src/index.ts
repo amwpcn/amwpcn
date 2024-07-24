@@ -1,3 +1,3 @@
-export { IContext } from './immutable-context';
-export { IHandlers, Step } from './step';
+export { IContext, IHandlers } from './immutable-context';
+export { Step } from './step';
 export { createExecutor } from './step-executor';

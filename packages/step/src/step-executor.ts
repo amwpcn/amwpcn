@@ -1,6 +1,6 @@
 import { Graph, GraphNode, GraphOptions } from './helpers';
-import { IContext, ImmutableContext } from './immutable-context';
-import { IHandlers, Step } from './step';
+import { IContext, IHandlers, ImmutableContext } from './immutable-context';
+import { Step } from './step';
 
 type StepStage = 'execute' | 'prepare' | 'final';
 type ErrorHandler = (error: unknown, stepName: string) => boolean;

@@ -1,10 +1,5 @@
 import { PriorityQueue } from './helpers';
-import { IContext } from './immutable-context';
-
-export interface IHandlers<C extends IContext> {
-  stopImmediate: () => void;
-  contextUpdater: (updater: (context: C) => Partial<C>) => void;
-}
+import { IContext, IHandlers } from './immutable-context';
 
 /**
  * Represents an abstract class for defining a step in a process flow.
@@ -12,13 +7,15 @@ export interface IHandlers<C extends IContext> {
  * @template C - The type of the shared context expected by all the steps.
  */
 export abstract class Step<C extends IContext = IContext> {
-  abstract name: string;
+  abstract readonly name: string;
 
   // A unique id for the step. This id has to be unique within the execution context.
-  private _id: string = Math.round(Date.now() * Math.random()).toString();
+  private readonly _id: string = Math.round(
+    Date.now() * Math.random(),
+  ).toString();
 
-  private _before = new PriorityQueue<Step<C>>();
-  private _after = new PriorityQueue<Step<C>>();
+  private readonly _before = new PriorityQueue<Step<C>>();
+  private readonly _after = new PriorityQueue<Step<C>>();
 
   constructor() {}
 

@@ -4,7 +4,7 @@ import { simulateAsyncTask } from '../helpers';
 interface UpdateDocumentCountContext extends IContext {}
 
 export class UpdateDocumentCountStep extends Step<UpdateDocumentCountContext> {
-  name = 'UpdateDocumentCount';
+  readonly name = 'UpdateDocumentCount';
 
   async execute(
     context: Readonly<UpdateDocumentCountContext>,

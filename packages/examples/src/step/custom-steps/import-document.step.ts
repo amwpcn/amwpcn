@@ -4,7 +4,7 @@ import { simulateAsyncTask } from '../helpers';
 interface ImportDocumentContext extends IContext {}
 
 export class ImportDocumentStep extends Step<ImportDocumentContext> {
-  name: string = 'ImportDocument';
+  readonly name: string = 'ImportDocument';
 
   async execute(
     context: Readonly<ImportDocumentContext>,

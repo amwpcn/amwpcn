@@ -1,5 +1,10 @@
 export interface IContext {}
 
+export interface IHandlers<C extends IContext> {
+  stopImmediate: () => void;
+  contextUpdater: (updater: (context: C) => Partial<C>) => void;
+}
+
 export class ImmutableContext<C extends IContext> {
   private _context: Readonly<C>;
 
