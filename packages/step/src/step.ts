@@ -26,12 +26,36 @@ export abstract class Step<C extends IContext = IContext> {
     return this._id;
   }
 
-  get beforeQueue(): PriorityQueue<Step<C>> {
-    return this._before;
+  /**
+   * This is true if the before queue is empty, otherwise false.
+   */
+  get isBeforeEmpty(): boolean {
+    return this._before.isEmpty;
   }
 
-  get afterQueue(): PriorityQueue<Step<C>> {
-    return this._after;
+  /**
+   * This is true if the after queue is empty, otherwise false.
+   */
+  get isAfterEmpty(): boolean {
+    return this._after.isEmpty;
+  }
+
+  /**
+   * Dequeues and returns an array of steps that are scheduled to execute before the current step.
+   *
+   * @returns An array of steps to be executed before the current step.
+   */
+  dequeueBefore(): Step<C>[] {
+    return this._before.dequeue();
+  }
+
+  /**
+   * Dequeues and returns an array of steps that are scheduled to execute after the current step.
+   *
+   * @returns An array of steps to be executed after the current step.
+   */
+  dequeueAfter(): Step<C>[] {
+    return this._after.dequeue();
   }
 
   /**

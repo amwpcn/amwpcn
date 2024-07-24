@@ -112,9 +112,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing before queue recursively
-    const before = step.beforeQueue;
-    while (!before.isEmpty) {
-      const steps = before.dequeue();
+    while (!step.isBeforeEmpty) {
+      const steps = step.dequeueBefore();
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
@@ -141,9 +140,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing after queue recursively
-    const after = step.afterQueue;
-    while (!after.isEmpty) {
-      const steps = after.dequeue();
+    while (!step.isAfterEmpty) {
+      const steps = step.dequeueAfter();
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
