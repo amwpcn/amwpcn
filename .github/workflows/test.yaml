@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Pulling master branch
-        run: git pull -f origin main:main
+        run: git pull -f origin master:master
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
