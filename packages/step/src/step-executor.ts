@@ -53,7 +53,7 @@ export class StepExecutor<C extends IContext> {
     s: Step<C> | Step<C>[],
     c: C,
     private _errorHandlers?: ErrorHandlers,
-    private _options?: Options,
+    _options?: Options,
   ) {
     this._steps = Array.isArray(s) ? s : [s];
     this._context = new ImmutableContext(c);
@@ -61,8 +61,8 @@ export class StepExecutor<C extends IContext> {
     this._graph = new Graph(_options?.graph);
   }
 
-  get visGraph() {
-    return this._graph.visGraphData;
+  get graphData() {
+    return this._graph.data;
   }
 
   /**
@@ -98,9 +98,8 @@ export class StepExecutor<C extends IContext> {
     const currentAncestors = ancestors ? [...ancestors, step.name] : [];
     this._checkRepetitions(currentAncestors, step.name);
 
-    const graphOptions = this._options?.graph;
     // Creates a new node for the current step and links it to the previous one
-    if (graphOptions) {
+    if (this._graph.enabled) {
       this._updateGraph(step, previous);
     }
 
@@ -126,7 +125,8 @@ export class StepExecutor<C extends IContext> {
       ]);
 
       // Before executions always comes back to the current step, hence we add the coming back edge to  the graph
-      if (graphOptions) for (const s of steps) this._updateGraph(step, s);
+      if (this._graph.enabled)
+        for (const s of steps) this._updateGraph(step, s);
 
       // If any before step of the current step or highest priority step requested an immediate stop
       if (this._stopImmediate) {

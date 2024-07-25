@@ -10,7 +10,7 @@ async function main() {
 
   await executor.start();
 
-  console.log(JSON.stringify(executor.visGraph, undefined, 2));
+  console.log(JSON.stringify(executor.graphData, undefined, 2));
 }
 
 main();

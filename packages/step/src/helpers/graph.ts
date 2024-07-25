@@ -37,7 +37,11 @@ export class Graph {
   private _nodes: GraphNode[] = [];
   private _edges: GraphEdge[] = [];
 
-  constructor(options?: GraphOptions) {}
+  constructor(private _options?: GraphOptions) {}
+
+  get enabled(): boolean {
+    return this._options?.enable ?? false;
+  }
 
   addNode(node: GraphNode) {
     const existingNode = this._nodes.find((n) => n.id === node.id);
@@ -54,7 +58,7 @@ export class Graph {
     return edge;
   }
 
-  get visGraphData() {
+  get data() {
     return { nodes: [...this._nodes], edges: [...this._edges] };
   }
 }
