@@ -7,19 +7,30 @@ on:
 
 jobs:
   test:
+    name: Changeset and Test
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pulling master branch
+        run: git pull -f origin master:master
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
-        run: yarn
+        run: yarn install --immutable
+
+      - name: Changeset check
+        run: yarn changeset status
 
       - name: Run tests
         run: yarn test
