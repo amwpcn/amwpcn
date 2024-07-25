@@ -1,4 +1,10 @@
-import { Graph, GraphNode, GraphOptions } from './helpers';
+import {
+  ConcurrencyManager,
+  ConcurrencyManagerOptions,
+  Graph,
+  GraphNode,
+  GraphOptions,
+} from './helpers';
 import { IContext, IHandlers, ImmutableContext } from './immutable-context';
 import {
   dequeueAfter,
@@ -21,6 +27,7 @@ interface ErrorHandlers {
 interface Options {
   graph?: GraphOptions;
   maxRepetitions?: number;
+  concurrency?: ConcurrencyManagerOptions;
 }
 
 /**
@@ -34,10 +41,11 @@ interface Options {
  * @param _options - (Optional) The options for configuring the StepExecutor.
  */
 export class StepExecutor<C extends IContext> {
-  private _steps: Step<C>[];
+  private readonly _steps: Step<C>[];
+  private readonly _maxRepetitions: number;
+  private readonly _graph: Graph;
+  private readonly _concurrencyManager: ConcurrencyManager;
   private _context: ImmutableContext<C>;
-  private _maxRepetitions: number;
-  private _graph: Graph;
 
   private _stopImmediate: boolean = false;
   private _handlers: IHandlers<C> = {
@@ -53,12 +61,13 @@ export class StepExecutor<C extends IContext> {
     s: Step<C> | Step<C>[],
     c: C,
     private _errorHandlers?: ErrorHandlers,
-    _options?: Options,
+    options?: Options,
   ) {
     this._steps = Array.isArray(s) ? s : [s];
     this._context = new ImmutableContext(c);
-    this._maxRepetitions = _options?.maxRepetitions ?? 10;
-    this._graph = new Graph(_options?.graph);
+    this._maxRepetitions = options?.maxRepetitions ?? 10;
+    this._graph = new Graph(options?.graph);
+    this._concurrencyManager = new ConcurrencyManager(options?.concurrency);
   }
 
   get graphData() {
@@ -134,6 +143,7 @@ export class StepExecutor<C extends IContext> {
       }
     }
 
+    await this._concurrencyManager.acquire();
     // Executing the current step
     try {
       await step.execute(this._context.get(), this._handlers);
@@ -144,6 +154,8 @@ export class StepExecutor<C extends IContext> {
         await step.rollback(this._context.get(), this._handlers);
         return;
       }
+    } finally {
+      this._concurrencyManager.release();
     }
 
     // Executing after queue recursively

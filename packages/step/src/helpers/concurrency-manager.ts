@@ -1,21 +1,25 @@
+export interface ConcurrencyManagerOptions {
+  limit?: number;
+  timeout?: number;
+}
+
 export class ConcurrencyManager {
   private _currentExecutions: number = 0;
   private _queue: (() => void)[] = [];
 
   private readonly _DEFAULT_TIMEOUT = 30_000; // 30 seconds
-  private readonly _concurrencyLimit: number;
+  private readonly _DEFAULT_LIMIT = 4;
+
+  private readonly _limit: number;
   private readonly _timeout: number;
 
-  constructor(
-    concurrencyLimit: number,
-    timeout: number = this._DEFAULT_TIMEOUT,
-  ) {
-    this._concurrencyLimit = concurrencyLimit;
-    this._timeout = timeout;
+  constructor(options?: ConcurrencyManagerOptions) {
+    this._limit = options?.limit ?? this._DEFAULT_LIMIT;
+    this._timeout = options?.timeout ?? this._DEFAULT_TIMEOUT;
   }
 
   async acquire(): Promise<void> {
-    if (this._currentExecutions < this._concurrencyLimit) {
+    if (this._currentExecutions < this._limit) {
       this._currentExecutions++;
       return Promise.resolve();
     }
