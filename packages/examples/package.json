@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "main": "dist/index",
   "private": true,
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
