@@ -2,7 +2,7 @@ export class ConcurrencyManager {
   private _currentExecutions: number = 0;
   private _queue: (() => void)[] = [];
 
-  private readonly _DEFAULT_TIMEOUT = 5_000; // 5 seconds
+  private readonly _DEFAULT_TIMEOUT = 30_000; // 30 seconds
   private readonly _concurrencyLimit: number;
   private readonly _timeout: number;
 

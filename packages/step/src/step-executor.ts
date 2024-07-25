@@ -119,8 +119,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing before queue recursively
-    while (!step[isBeforeEmpty]) {
-      const steps = step[dequeueBefore]();
+    while (!isBeforeEmpty(step)) {
+      const steps = dequeueBefore(step);
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
@@ -147,8 +147,8 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing after queue recursively
-    while (!step[isAfterEmpty]) {
-      const steps = step[dequeueAfter]();
+    while (!isAfterEmpty(step)) {
+      const steps = dequeueAfter(step);
       await Promise.all([
         ...steps.map((s) => this._start(s, step, currentAncestors)),
       ]);
@@ -188,14 +188,14 @@ export class StepExecutor<C extends IContext> {
 
   private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
     const currentNode = this._graph.addNode({
-      id: current[stepId],
+      id: stepId(current),
       label: current.name,
     });
 
     if (previous) {
       this._graph.addEdge({
-        from: previous[stepId],
-        to: current[stepId],
+        from: stepId(previous),
+        to: stepId(current),
         arrows: 'to',
         smooth: { type: 'curvedCW', roundness: 0.2 },
       });

@@ -1,11 +1,11 @@
 import { PriorityQueue } from './helpers';
 import { IContext, IHandlers } from './immutable-context';
 
-export const isBeforeEmpty: unique symbol = Symbol();
-export const isAfterEmpty: unique symbol = Symbol();
-export const dequeueBefore: unique symbol = Symbol();
-export const dequeueAfter: unique symbol = Symbol();
-export const stepId: unique symbol = Symbol();
+const isBeforeEmptySymbol: unique symbol = Symbol();
+const isAfterEmptySymbol: unique symbol = Symbol();
+const dequeueBeforeSymbol: unique symbol = Symbol();
+const dequeueAfterSymbol: unique symbol = Symbol();
+const stepIdSymbol: unique symbol = Symbol();
 
 /**
  * Represents an abstract class for defining a step in a process flow.
@@ -25,21 +25,21 @@ export abstract class Step<C extends IContext = IContext> {
 
   constructor() {}
 
-  get [stepId]() {
+  get [stepIdSymbol]() {
     return this._id;
   }
 
   /**
    * This is true if the before queue is empty, otherwise false.
    */
-  get [isBeforeEmpty](): boolean {
+  get [isBeforeEmptySymbol](): boolean {
     return this._before.isEmpty;
   }
 
   /**
    * This is true if the after queue is empty, otherwise false.
    */
-  get [isAfterEmpty](): boolean {
+  get [isAfterEmptySymbol](): boolean {
     return this._after.isEmpty;
   }
 
@@ -48,7 +48,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @returns An array of steps to be executed before the current step.
    */
-  [dequeueBefore](): Step<C>[] {
+  [dequeueBeforeSymbol](): Step<C>[] {
     return this._before.dequeue();
   }
 
@@ -57,7 +57,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @returns An array of steps to be executed after the current step.
    */
-  [dequeueAfter](): Step<C>[] {
+  [dequeueAfterSymbol](): Step<C>[] {
     return this._after.dequeue();
   }
 
@@ -146,4 +146,56 @@ export abstract class Step<C extends IContext = IContext> {
    * @param context The shared context object.
    */
   async final(context: Readonly<C>): Promise<void> {}
+}
+
+// Friend functions to access symbol members
+
+/**
+ * Dequeues the steps needed to be executed before the provided step.
+ *
+ * @param step A step instance.
+ * @returns An array of steps before the provided step.
+ */
+export function dequeueBefore<C extends IContext>(step: Step<C>): Step<C>[] {
+  return step[dequeueBeforeSymbol]();
+}
+
+/**
+ * Dequeues the steps needed to be executed after the provided step.
+ *
+ * @param step - A step instance.
+ * @returns  An array of steps after the provided step.
+ */
+export function dequeueAfter<C extends IContext>(step: Step<C>): Step<C>[] {
+  return step[dequeueAfterSymbol]();
+}
+
+/**
+ * Checks if there are steps to in the beforeQueue of the provided step.
+ *
+ * @param step - The step to check.
+ * @returns A boolean indicating whether the beforeQueue is empty or not.
+ */
+export function isBeforeEmpty<C extends IContext>(step: Step<C>): boolean {
+  return step[isBeforeEmptySymbol];
+}
+
+/**
+ * Checks if there are steps to in the afterQueue of the provided step.
+ *
+ * @param step - The step to check.
+ * @returns A boolean indicating whether the afterQueue is empty or not.
+ */
+export function isAfterEmpty<C extends IContext>(step: Step<C>): boolean {
+  return step[isAfterEmptySymbol];
+}
+
+/**
+ * Returns the unique identifier of the provided step.
+ *
+ * @param step - The step object for which to retrieve the identifier.
+ * @returns A string representing the unique identifier of the step.
+ */
+export function stepId<C extends IContext>(step: Step<C>): string {
+  return step[stepIdSymbol];
 }
