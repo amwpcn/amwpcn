@@ -10,7 +10,10 @@
     "node": ">=16"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "yarn lerna run build",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
   "dependencies": {
     "@changesets/cli": "^2.27.7"
