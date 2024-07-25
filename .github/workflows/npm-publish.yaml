@@ -16,8 +16,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Pulling master branch
-        run: git pull -f origin master:master
-        run: git checkout master
+        run: |
+          git pull -f origin master:master
+          git checkout master
 
       - name: Setup Node.js 20.x
         uses: actions/setup-node@v3
