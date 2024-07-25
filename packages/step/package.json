@@ -1,6 +1,6 @@
 {
   "name": "@amwpcn/step",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Achintha Weerasinghe <achinthamadumal@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,11 @@
   "engines": {
     "node": ">=16"
   },
-  "files": ["dist", "README.md", "LICENSE.txt"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.txt"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
