@@ -41,6 +41,8 @@ interface Options {
  * @param _options - (Optional) The options for configuring the StepExecutor.
  */
 export class StepExecutor<C extends IContext> {
+  private readonly _MAX_REPETITIONS = 10;
+
   private readonly _steps: Step<C>[];
   private readonly _maxRepetitions: number;
   private readonly _graph: Graph;
@@ -65,7 +67,7 @@ export class StepExecutor<C extends IContext> {
   ) {
     this._steps = Array.isArray(s) ? s : [s];
     this._context = new ImmutableContext(c);
-    this._maxRepetitions = options?.maxRepetitions ?? 10;
+    this._maxRepetitions = options?.maxRepetitions ?? this._MAX_REPETITIONS;
     this._graph = new Graph(options?.graph);
     this._concurrencyManager = new ConcurrencyManager(options?.concurrency);
   }
@@ -143,12 +145,15 @@ export class StepExecutor<C extends IContext> {
       }
     }
 
-    await this._concurrencyManager.acquire();
     // Executing the current step
+    const immediateSteps: Step<C>[] = [];
     try {
-      await step.execute(this._context.get(), this._handlers);
+      await this._concurrencyManager.acquire();
+      const result = await step.execute(this._context.get(), this._handlers);
 
-      // TODO: Circular dependency check needed here (Probably using a Set<string> of step names)
+      if (result) {
+        immediateSteps.push(...(Array.isArray(result) ? result : [result]));
+      }
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'execute')) {
         await step.rollback(this._context.get(), this._handlers);
@@ -157,6 +162,12 @@ export class StepExecutor<C extends IContext> {
     } finally {
       this._concurrencyManager.release();
     }
+
+    // Immediate steps returned by the current execute function should be executed immediately
+    // even before the after queue steps.
+    await Promise.all(
+      immediateSteps.map((s) => this._start(s, step, currentAncestors)),
+    );
 
     // Executing after queue recursively
     while (!isAfterEmpty(step)) {

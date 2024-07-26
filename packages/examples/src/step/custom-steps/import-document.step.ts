@@ -1,5 +1,6 @@
 import { IContext, IHandlers, Step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { updateDocumentCount } from './update-document-count.step';
 
 interface ImportDocumentContext extends IContext {}
 
@@ -13,6 +14,7 @@ export class ImportDocumentStep extends Step<ImportDocumentContext> {
     await simulateAsyncTask();
 
     // this.enqueueAfter(importDocument(), 0);
+    return updateDocumentCount();
   }
 }
 
