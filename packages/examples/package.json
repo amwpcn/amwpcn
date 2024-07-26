@@ -1,6 +1,6 @@
 {
   "name": "@amwpcn/examples",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "dist/index",
   "private": true,
   "engines": {
