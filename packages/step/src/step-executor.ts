@@ -239,6 +239,13 @@ export class StepExecutor<C extends IContext> {
     }
   }
 
+  /**
+   * Updates the graph with a new node representing the current step and adds an edge linking it to the previous step if it exists.
+   *
+   * @param current - The current step to update the graph with.
+   * @param options - The execution options including the previous step, ancestors, and queue order.
+   * @returns The newly created graph node representing the current step.
+   */
   private _updateGraph(
     current: Step<C>,
     { previous, ancestors, queueOrder }: ExecutionOptions<C>,
@@ -261,6 +268,15 @@ export class StepExecutor<C extends IContext> {
     return currentNode;
   }
 
+  /**
+   * Handles error handling for a specific stage of a step during execution.
+   *
+   * @param error - The error that occurred during the execution.
+   * @param stepName - The name of the step where the error occurred.
+   * @param stage - The stage of the step where the error occurred (prepare, execute, final).
+   * @returns A boolean indicating if the execution should continue.
+   * If true, the execution will immediately stop, otherwise continue assuming the error was handled.
+   */
   private _defaultErrorHandler(
     error: unknown,
     stepName: string,
@@ -277,6 +293,15 @@ export class StepExecutor<C extends IContext> {
   }
 }
 
+/**
+ * Creates a new executor for the given step or array of steps with the provided context, error handlers, and options.
+ *
+ * @param s The step or array of steps to be executed.
+ * @param c The context for the execution.
+ * @param errorHandlers (Optional) The error handlers to handle any errors during execution.
+ * @param options (Optional) The options for customizing the execution behavior.
+ * @returns A new StepExecutor instance initialized with the provided parameters.
+ */
 export function createExecutor<C extends IContext>(
   s: Step<C> | Step<C>[],
   c: C,
