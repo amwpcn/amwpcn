@@ -222,6 +222,14 @@ export class StepExecutor<C extends IContext> {
     }
   }
 
+  /**
+   * Checks the number of occurrences of a step name within its ancestors to prevent exceeding the maximum allowed repetitions.
+   * Throws an error if the step has been repeated more times than the maximum allowed.
+   *
+   * @param ancestors - An array of strings representing the ancestors of the current step.
+   * @param stepName - The name of the step to check for repetitions.
+   * @throws Error if the step has been repeated more times than the maximum allowed repetitions.
+   */
   private _checkRepetitions(
     ancestors: string[],
     stepName: string,
