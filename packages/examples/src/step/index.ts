@@ -1,12 +1,18 @@
 import { createExecutor } from '@amwpcn/step';
-import { cleanup, importDocument } from './custom-steps';
+import { cleanup, deleteDocument, notification } from './custom-steps';
 
 async function main() {
-  const step = importDocument()
-    .enqueueBefore(cleanup(), 0)
-    .enqueueAfter(cleanup(), 1);
+  // const importStep = importDocument()
+  //   .enqueueBefore(cleanup(), 0)
+  //   .enqueueAfter(cleanup(), 1)
+  //   .enqueueAfter(notification(), 2);
 
-  const executor = createExecutor(step, {}, undefined, {
+  const deleteStep = deleteDocument()
+    .enqueueBefore(cleanup(), 0)
+    .enqueueAfter(cleanup(), 1)
+    .enqueueAfter(notification(), 2);
+
+  const executor = createExecutor(deleteStep, {}, undefined, {
     graph: { enable: true },
     maxRepetitions: 2,
     concurrency: {
