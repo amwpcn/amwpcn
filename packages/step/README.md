@@ -255,7 +255,7 @@ generated using vis-network. Note that `executor.graphData` does not return a
 vis-network graph. We created this graph after mapping the returned data to
 vis-network.
 
-![Step Example Graph](https://github.com/amwpcn/amwpcn/tree/master/packages/examples/src/step/static/sample-vis-execution-graph.png)
+![Step Example Graph](https://raw.githubusercontent.com/amwpcn/amwpcn/master/packages/examples/src/step/static/sample-vis-execution-graph.png)
 
 ## API Reference
 
