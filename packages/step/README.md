@@ -2,7 +2,7 @@
 [![npm latest](https://img.shields.io/npm/v/@amwpcn/step/latest)](https://www.npmjs.com/package/@amwpcn/step)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Step Package
+# Step
 
 The Step package provides a framework for defining and executing steps with
 before and after hooks, and concurrency management.
