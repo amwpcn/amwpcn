@@ -41,6 +41,7 @@ async function main() {
     title: n.ancestors?.join(', '),
     shape: 'box',
   }));
+
   console.log(JSON.stringify({ nodes, edges }, undefined, 2));
 }
 

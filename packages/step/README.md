@@ -239,6 +239,24 @@ executor
   });
 ```
 
+### Graphs
+
+If you enable graphs for execution, nodes and edges required for generation of a
+graph will be available via executor, once you ran the `start()`.
+
+```typescript
+await executor.start();
+const graphData = executor.graphData;
+```
+
+You could use the above graph data to create your graph using any other graph
+libraries or save it for debugging later as a JSON file. Here is a example graph
+generated using vis-network. Note that `executor.graphData` does not return a
+vis-network graph. We created this graph after mapping the returned data to
+vis-network.
+
+![Step Example Graph](https://github.com/amwpcn/amwpcn/tree/master/packages/examples/src/step/static/sample-vis-execution-graph.png)
+
 ## API Reference
 
 ### Step Class
