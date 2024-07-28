@@ -1,5 +1,11 @@
 # @amwpcn/step
 
+## 0.0.3
+
+### Patch Changes
+
+- 9cc517e: IStep interface and documentation
+
 ## 0.0.2
 
 ### Patch Changes
