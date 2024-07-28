@@ -30,6 +30,12 @@ interface Options {
   concurrency?: ConcurrencyManagerOptions;
 }
 
+interface ExecutionOptions<C extends IContext> {
+  previous?: Step<C>;
+  ancestors?: string[];
+  queueOrder?: number;
+}
+
 /**
  * Class representing a StepExecutor that asynchronously starts the execution of provided steps concurrently.
  * Handles preparation, before queue execution, current step execution, after queue execution, and finalization of all steps.
@@ -87,7 +93,7 @@ export class StepExecutor<C extends IContext> {
    */
   async start(): Promise<void> {
     // All the provided steps will start executing concurrently
-    await Promise.all([...this._steps.map((s) => this._start(s))]);
+    await Promise.all([...this._steps.map((s) => this._start(s, {}))]);
   }
 
   /**
@@ -102,16 +108,19 @@ export class StepExecutor<C extends IContext> {
    */
   private async _start(
     step: Step<C>,
-    previous?: Step<C>,
-    ancestors?: string[],
+    options: ExecutionOptions<C>,
   ): Promise<void> {
+    const { ancestors } = options;
+
     // Validate circular dependency
-    const currentAncestors = ancestors ? [...ancestors, step.name] : [];
+    const currentAncestors = ancestors
+      ? [...ancestors, step.name]
+      : [step.name];
     this._checkRepetitions(currentAncestors, step.name);
 
     // Creates a new node for the current step and links it to the previous one
     if (this._graph.enabled) {
-      this._updateGraph(step, previous);
+      this._updateGraph(step, options);
     }
 
     // If any step other requested an immediate stop
@@ -129,15 +138,28 @@ export class StepExecutor<C extends IContext> {
     }
 
     // Executing before queue recursively
-    while (!isBeforeEmpty(step)) {
+    for (let queueOrder = 0; !isBeforeEmpty(step); queueOrder++) {
       const steps = dequeueBefore(step);
       await Promise.all([
-        ...steps.map((s) => this._start(s, step, currentAncestors)),
+        ...steps.map((s) =>
+          this._start(s, {
+            previous: step,
+            ancestors: currentAncestors,
+            queueOrder,
+          }),
+        ),
       ]);
 
-      // Before executions always comes back to the current step, hence we add the coming back edge to  the graph
-      if (this._graph.enabled)
-        for (const s of steps) this._updateGraph(step, s);
+      // Before-executions always come back to the current step, hence we add the coming back edge to  the graph
+      if (this._graph.enabled) {
+        for (const s of steps) {
+          this._updateGraph(step, {
+            ...options,
+            previous: s,
+            queueOrder: undefined, // Coming-back-edges orders are same as initial order
+          });
+        }
+      }
 
       // If any before step of the current step or highest priority step requested an immediate stop
       if (this._stopImmediate) {
@@ -166,14 +188,22 @@ export class StepExecutor<C extends IContext> {
     // Immediate steps returned by the current execute function should be executed immediately
     // even before the after queue steps.
     await Promise.all(
-      immediateSteps.map((s) => this._start(s, step, currentAncestors)),
+      immediateSteps.map((s) =>
+        this._start(s, { previous: step, ancestors: currentAncestors }),
+      ),
     );
 
     // Executing after queue recursively
-    while (!isAfterEmpty(step)) {
+    for (let queueOrder = 0; !isAfterEmpty(step); queueOrder++) {
       const steps = dequeueAfter(step);
       await Promise.all([
-        ...steps.map((s) => this._start(s, step, currentAncestors)),
+        ...steps.map((s) =>
+          this._start(s, {
+            previous: step,
+            ancestors: currentAncestors,
+            queueOrder,
+          }),
+        ),
       ]);
 
       // If any highest priority step requested an immediate stop
@@ -192,6 +222,14 @@ export class StepExecutor<C extends IContext> {
     }
   }
 
+  /**
+   * Checks the number of occurrences of a step name within its ancestors to prevent exceeding the maximum allowed repetitions.
+   * Throws an error if the step has been repeated more times than the maximum allowed.
+   *
+   * @param ancestors - An array of strings representing the ancestors of the current step.
+   * @param stepName - The name of the step to check for repetitions.
+   * @throws Error if the step has been repeated more times than the maximum allowed repetitions.
+   */
   private _checkRepetitions(
     ancestors: string[],
     stepName: string,
@@ -209,24 +247,44 @@ export class StepExecutor<C extends IContext> {
     }
   }
 
-  private _updateGraph(current: Step<C>, previous?: Step<C>): GraphNode {
+  /**
+   * Updates the graph with a new node representing the current step and adds an edge linking it to the previous step if it exists.
+   *
+   * @param current - The current step to update the graph with.
+   * @param options - The execution options including the previous step, ancestors, and queue order.
+   * @returns The newly created graph node representing the current step.
+   */
+  private _updateGraph(
+    current: Step<C>,
+    { previous, ancestors, queueOrder }: ExecutionOptions<C>,
+  ): GraphNode {
     const currentNode = this._graph.addNode({
       id: stepId(current),
       label: current.name,
+      ancestors,
+      queueOrder,
     });
 
     if (previous) {
       this._graph.addEdge({
         from: stepId(previous),
         to: stepId(current),
-        arrows: 'to',
-        smooth: { type: 'curvedCW', roundness: 0.2 },
+        queueOrder,
       });
     }
 
     return currentNode;
   }
 
+  /**
+   * Handles error handling for a specific stage of a step during execution.
+   *
+   * @param error - The error that occurred during the execution.
+   * @param stepName - The name of the step where the error occurred.
+   * @param stage - The stage of the step where the error occurred (prepare, execute, final).
+   * @returns A boolean indicating if the execution should continue.
+   * If true, the execution will immediately stop, otherwise continue assuming the error was handled.
+   */
   private _defaultErrorHandler(
     error: unknown,
     stepName: string,
@@ -243,6 +301,15 @@ export class StepExecutor<C extends IContext> {
   }
 }
 
+/**
+ * Creates a new executor for the given step or array of steps with the provided context, error handlers, and options.
+ *
+ * @param s The step or array of steps to be executed.
+ * @param c The context for the execution.
+ * @param errorHandlers (Optional) The error handlers to handle any errors during execution.
+ * @param options (Optional) The options for customizing the execution behavior.
+ * @returns A new StepExecutor instance initialized with the provided parameters.
+ */
 export function createExecutor<C extends IContext>(
   s: Step<C> | Step<C>[],
   c: C,

@@ -23,7 +23,25 @@ async function main() {
 
   await executor.start();
 
-  console.log(JSON.stringify(executor.graphData, undefined, 2));
+  // Vis Network graph mapping
+  const edges = executor.graphData.edges.map((e) => ({
+    from: e.from,
+    to: e.to,
+    label: e.queueOrder,
+    arrows: 'to',
+    smooth: {
+      type: 'dynamic',
+      roundness: 0.5,
+      forceDirection: 'none',
+    },
+  }));
+  const nodes = executor.graphData.nodes.map((n) => ({
+    id: n.id,
+    label: n.label,
+    title: n.ancestors?.join(', '),
+    shape: 'box',
+  }));
+  console.log(JSON.stringify({ nodes, edges }, undefined, 2));
 }
 
 main();
