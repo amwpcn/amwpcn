@@ -1,32 +1,14 @@
 export interface GraphNode {
   id: string;
   label: string;
-  title?: string;
-  color?: string;
-  shape?: string;
+  ancestors?: string[];
+  queueOrder?: number;
 }
 
 export interface GraphEdge {
   from: string;
   to: string;
-  label?: string;
-  title?: string;
-  color?: string;
-  arrows?: 'from' | 'to' | 'middle';
-  smooth?: {
-    type:
-      | 'dynamic'
-      | 'continuous'
-      | 'discrete'
-      | 'diagonalCross'
-      | 'straightCross'
-      | 'horizontal'
-      | 'vertical'
-      | 'curvedCW'
-      | 'curvedCCW'
-      | 'cubicBezier';
-    roundness: number;
-  };
+  queueOrder?: number;
 }
 
 export interface GraphOptions {
