@@ -6,7 +6,7 @@
 [![npm latest](https://img.shields.io/npm/v/@amwpcn/step/latest)](https://www.npmjs.com/package/@amwpcn/step)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Step Package
+# Step
 
 The Step package provides a framework for defining and executing steps with
 before and after hooks, and concurrency management.
@@ -222,7 +222,16 @@ import { StepExecutor } from '@amwpcn/step';
 
 const context = {}; // Your initial context
 const errorHandlers = {
-  execute: (error, stepName) => {},
+  // By returning true: execution of all steps will immediately be stopped.
+  execute(error, stepName) {
+    console.error(stepName, error);
+    return true;
+  },
+  // By returning false: execution will continue despite the error.
+  final(error, stepName) {
+    console.warn(stepName, error);
+    return false;
+  },
 }; // error handlers for each stage
 
 const executor = createExecutor(deleteStep, {}, errorHandlers, {
@@ -242,6 +251,27 @@ executor
     console.error('Execution failed', error);
   });
 ```
+
+If you do not define error handlers, the default error handler will kick in and
+immediately log and stop the execution.
+
+### Graphs
+
+If you enable graphs for execution, nodes and edges required for generation of a
+graph will be available via executor, once you ran the `start()`.
+
+```typescript
+await executor.start();
+const graphData = executor.graphData;
+```
+
+You could use the above graph data to create your graph using any other graph
+libraries or save it for debugging later as a JSON file. Here is a example graph
+generated using vis-network. Note that `executor.graphData` does not return a
+vis-network graph. We created this graph after mapping the returned data to
+vis-network.
+
+![Step Example Graph](https://raw.githubusercontent.com/amwpcn/amwpcn/master/packages/examples/src/step/static/sample-vis-execution-graph.png)
 
 ## API Reference
 
@@ -286,7 +316,9 @@ constructor(
 - `steps: Step<C> | Step<C>[]`: A single step or an array of steps to execute.
 - `context`: The initial context for the execution.
 - `errorHandlers?: ErrorHandlers`: (Optional). This will take 3 optional error
-  handlers for each stage (prepare, execute, final).
+  handlers for each stage (prepare, execute, final). If you do not define an
+  error handler for a stage, default error handler will log and stop the
+  execution.
   ```typescript
    const errorHandlers = {
       execute: (error: unknown, stepName: string) => boolean;
