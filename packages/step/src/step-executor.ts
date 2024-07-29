@@ -2,6 +2,7 @@ import {
   ConcurrencyManager,
   ConcurrencyManagerOptions,
   Graph,
+  GraphData,
   GraphNode,
   GraphOptions,
 } from './helpers';
@@ -78,8 +79,8 @@ export class StepExecutor<C extends IContext> {
     this._concurrencyManager = new ConcurrencyManager(options?.concurrency);
   }
 
-  get graphData() {
-    return this._graph.data;
+  get graphData(): GraphData {
+    return this._graph.enabled ? this._graph.data : { nodes: [], edges: [] };
   }
 
   /**
@@ -119,20 +120,18 @@ export class StepExecutor<C extends IContext> {
     this._checkRepetitions(currentAncestors, step.name);
 
     // Creates a new node for the current step and links it to the previous one
-    if (this._graph.enabled) {
-      this._updateGraph(step, options);
-    }
+    const graphNode = this._updateGraph(step, options);
 
     // If any step other requested an immediate stop
     if (this._stopImmediate) {
-      return;
+      return this._stopImmediateFinalize(graphNode);
     }
 
     // Preparations
     try {
       await step.prepare(this._context.get());
     } catch (error) {
-      if (this._defaultErrorHandler(error, step.name, 'prepare')) {
+      if (this._defaultErrorHandler(error, step.name, 'prepare', graphNode)) {
         return;
       }
     }
@@ -163,7 +162,7 @@ export class StepExecutor<C extends IContext> {
 
       // If any before step of the current step or highest priority step requested an immediate stop
       if (this._stopImmediate) {
-        return;
+        return this._stopImmediateFinalize(graphNode);
       }
     }
 
@@ -177,7 +176,7 @@ export class StepExecutor<C extends IContext> {
         immediateSteps.push(...(Array.isArray(result) ? result : [result]));
       }
     } catch (error) {
-      if (this._defaultErrorHandler(error, step.name, 'execute')) {
+      if (this._defaultErrorHandler(error, step.name, 'execute', graphNode)) {
         await step.rollback(this._context.get(), this._handlers);
         return;
       }
@@ -192,6 +191,11 @@ export class StepExecutor<C extends IContext> {
         this._start(s, { previous: step, ancestors: currentAncestors }),
       ),
     );
+
+    // If any of the immediate steps requested an immediate stop
+    if (this._stopImmediate) {
+      return this._stopImmediateFinalize(graphNode);
+    }
 
     // Executing after queue recursively
     for (let queueOrder = 0; !isAfterEmpty(step); queueOrder++) {
@@ -208,7 +212,7 @@ export class StepExecutor<C extends IContext> {
 
       // If any highest priority step requested an immediate stop
       if (this._stopImmediate) {
-        return;
+        return this._stopImmediateFinalize(graphNode);
       }
     }
 
@@ -216,7 +220,7 @@ export class StepExecutor<C extends IContext> {
     try {
       await step.final(this._context.get());
     } catch (error) {
-      if (this._defaultErrorHandler(error, step.name, 'final')) {
+      if (this._defaultErrorHandler(error, step.name, 'final', graphNode)) {
         return;
       }
     }
@@ -276,6 +280,10 @@ export class StepExecutor<C extends IContext> {
     return currentNode;
   }
 
+  private _stopImmediateFinalize(graphNode: GraphNode): void {
+    graphNode.isError = true;
+  }
+
   /**
    * Handles error handling for a specific stage of a step during execution.
    *
@@ -289,6 +297,7 @@ export class StepExecutor<C extends IContext> {
     error: unknown,
     stepName: string,
     stage: StepStage,
+    graphNode: GraphNode,
   ): boolean {
     const fn = this._errorHandlers?.[stage];
     if (fn) {
@@ -297,6 +306,7 @@ export class StepExecutor<C extends IContext> {
 
     console.error({ stepName, stage, error });
     this._handlers.stopImmediate();
+    this._stopImmediateFinalize(graphNode);
     return true;
   }
 }
