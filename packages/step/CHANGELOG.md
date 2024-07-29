@@ -1,5 +1,12 @@
 # @amwpcn/step
 
+## 0.0.4
+
+### Patch Changes
+
+- 1b334e7: Error handling improved, documentation improved, error flag on graph
+  nodes
+
 ## 0.0.3
 
 ### Patch Changes

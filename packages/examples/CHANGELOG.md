@@ -1,5 +1,12 @@
 # @amwpcn/examples
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [1b334e7]
+  - @amwpcn/step@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
