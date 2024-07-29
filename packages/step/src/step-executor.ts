@@ -301,7 +301,13 @@ export class StepExecutor<C extends IContext> {
   ): boolean {
     const fn = this._errorHandlers?.[stage];
     if (fn) {
-      return fn(error, stepName);
+      if (fn(error, stepName)) {
+        this._handlers.stopImmediate();
+        this._stopImmediateFinalize(graphNode);
+        return true;
+      }
+
+      return false;
     }
 
     console.error({ stepName, stage, error });
@@ -317,6 +323,24 @@ export class StepExecutor<C extends IContext> {
  * @param s The step or array of steps to be executed.
  * @param c The context for the execution.
  * @param errorHandlers (Optional) The error handlers to handle any errors during execution.
+ * In any of the handler, by returning false, error will be ignored and execution will be continued.
+ * By returning true, the execution will be immediately stopped.
+ * @example
+ * ```typescript
+ * const errorHandlers = {
+ *  // This will stop the execution.
+ *  execute(error, stepName) {
+ *    console.error(stepName, error);
+ *    return true;
+ *  },
+ *  // This will not stop the execution.
+ *  final(error, stepName) {
+ *    console.warn(stepName, error);
+ *    return false;
+ *  }
+ * }
+ * ```
+ *
  * @param options (Optional) The options for customizing the execution behavior.
  * @returns A new StepExecutor instance initialized with the provided parameters.
  */
