@@ -3,12 +3,18 @@ export interface GraphNode {
   label: string;
   ancestors?: string[];
   queueOrder?: number;
+  isError?: true;
 }
 
 export interface GraphEdge {
   from: string;
   to: string;
   queueOrder?: number;
+}
+
+export interface GraphData {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
 }
 
 export interface GraphOptions {
@@ -25,7 +31,7 @@ export class Graph {
     return this._options?.enable ?? false;
   }
 
-  addNode(node: GraphNode) {
+  addNode(node: GraphNode): GraphNode {
     const existingNode = this._nodes.find((n) => n.id === node.id);
     if (existingNode) {
       return existingNode;
@@ -35,12 +41,12 @@ export class Graph {
     return node;
   }
 
-  addEdge(edge: GraphEdge) {
+  addEdge(edge: GraphEdge): GraphEdge {
     this._edges.push(edge);
     return edge;
   }
 
-  get data() {
+  get data(): GraphData {
     return { nodes: [...this._nodes], edges: [...this._edges] };
   }
 }

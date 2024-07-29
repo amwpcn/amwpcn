@@ -218,7 +218,16 @@ import { StepExecutor } from '@amwpcn/step';
 
 const context = {}; // Your initial context
 const errorHandlers = {
-  execute: (error, stepName) => {},
+  // By returning true: execution of all steps will immediately be stopped.
+  execute(error, stepName) {
+    console.error(stepName, error);
+    return true;
+  },
+  // By returning false: execution will continue despite the error.
+  final(error, stepName) {
+    console.warn(stepName, error);
+    return false;
+  },
 }; // error handlers for each stage
 
 const executor = createExecutor(deleteStep, {}, errorHandlers, {
@@ -238,6 +247,9 @@ executor
     console.error('Execution failed', error);
   });
 ```
+
+If you do not define error handlers, the default error handler will kick in and
+immediately log and stop the execution.
 
 ### Graphs
 
@@ -300,7 +312,9 @@ constructor(
 - `steps: Step<C> | Step<C>[]`: A single step or an array of steps to execute.
 - `context`: The initial context for the execution.
 - `errorHandlers?: ErrorHandlers`: (Optional). This will take 3 optional error
-  handlers for each stage (prepare, execute, final).
+  handlers for each stage (prepare, execute, final). If you do not define an
+  error handler for a stage, default error handler will log and stop the
+  execution.
   ```typescript
    const errorHandlers = {
       execute: (error: unknown, stepName: string) => boolean;

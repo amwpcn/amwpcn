@@ -34,12 +34,14 @@ async function main() {
       roundness: 0.5,
       forceDirection: 'none',
     },
+    color: 'black',
   }));
   const nodes = executor.graphData.nodes.map((n) => ({
     id: n.id,
     label: n.label,
     title: n.ancestors?.join(', '),
     shape: 'box',
+    color: n.isError ? 'pink' : undefined,
   }));
 
   console.log(JSON.stringify({ nodes, edges }, undefined, 2));
