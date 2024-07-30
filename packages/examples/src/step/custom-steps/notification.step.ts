@@ -6,7 +6,10 @@ class NotificationStep implements IStep<MyContext> {
   private _myCustomDuration: number = 500;
   private _myCustomResult: string = '';
 
-  async prepare(context: Readonly<MyContext>): Promise<void> {
+  async prepare(
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
+  ): Promise<void> {
     this._myCustomDuration = Math.round(Math.random() * 901 + 100);
   }
 
@@ -19,7 +22,10 @@ class NotificationStep implements IStep<MyContext> {
     this._myCustomResult = 'Execution was successful!';
   }
 
-  async final(context: Readonly<MyContext>): Promise<void> {
+  async final(
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
+  ): Promise<void> {
     console.log(this._myCustomResult);
   }
 }

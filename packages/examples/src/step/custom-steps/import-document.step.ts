@@ -18,7 +18,10 @@ export class ImportDocumentStep extends Step<MyContext> {
     return updateDocumentCount();
   }
 
-  async final(context: Readonly<MyContext>): Promise<void> {
+  async final(
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
+  ): Promise<void> {
     console.log(context.something);
   }
 }

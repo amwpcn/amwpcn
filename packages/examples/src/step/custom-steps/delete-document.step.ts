@@ -7,7 +7,7 @@ const deleteDocumentStep: IStep<MyContext> & {
   myCustomDuration?: number;
   myCustomResult?: string;
 } = {
-  async prepare(context) {
+  async prepare(context, handlers) {
     this.myCustomDuration = Math.round(Math.random() * 901 + 100); // Random number between 100 - 1000
   },
   async execute(context, handlers) {
@@ -18,7 +18,7 @@ const deleteDocumentStep: IStep<MyContext> & {
 
     return updateDocumentCount();
   },
-  async final(context) {
+  async final(context, handlers) {
     console.log(this.myCustomResult);
   },
 };
