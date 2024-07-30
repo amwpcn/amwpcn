@@ -131,12 +131,9 @@ export abstract class Step<C extends IContext = IContext> {
    * If you change anything during the execution of the step, those changes will also appear here.
    * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
    * for example `handlers.stopImmediate()` will stop all the executions immediately.
-   * @returns A promise that resolves to void, an array of steps, or a single step.
+   * @returns A promise that resolves to void.
    */
-  async rollback(
-    context: Readonly<C>,
-    handlers: IHandlers<C>,
-  ): Promise<void | Step<C>[] | Step<C>> {}
+  async rollback(context: Readonly<C>, handlers: IHandlers<C>): Promise<void> {}
 
   /**
    * This function will be called at the end even after the execution of steps in the after queue.
