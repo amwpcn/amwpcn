@@ -100,7 +100,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @param context The shared context object.
    */
-  async prepare(context: Readonly<C>): Promise<void> {}
+  async prepare(context: Readonly<C>, handlers: IHandlers<C>): Promise<void> {}
 
   /**
    * This is the only required function for you to implement when you extend the Step class.
@@ -145,7 +145,7 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * @param context The shared context object.
    */
-  async final(context: Readonly<C>): Promise<void> {}
+  async final(context: Readonly<C>, handlers: IHandlers<C>): Promise<void> {}
 }
 
 // Friend functions to access symbol members

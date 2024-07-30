@@ -1,14 +1,13 @@
 import { IContext, IHandlers, Step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { MyContext } from './common';
 
-interface CleanupContext extends IContext {}
-
-export class CleanupStep extends Step<CleanupContext> {
+export class CleanupStep extends Step<MyContext> {
   readonly name: string = 'CleanupStep';
 
   async execute(
-    context: Readonly<CleanupContext>,
-    handlers: IHandlers<CleanupContext>,
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
   ): Promise<void | Step<IContext>[] | Step<IContext>> {
     await simulateAsyncTask();
   }

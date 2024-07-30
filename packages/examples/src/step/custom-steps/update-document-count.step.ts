@@ -1,17 +1,14 @@
-import { IContext, IHandlers, Step } from '@amwpcn/step';
+import { IHandlers, Step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { MyContext } from './common';
 
-interface UpdateDocumentCountContext extends IContext {}
-
-export class UpdateDocumentCountStep extends Step<UpdateDocumentCountContext> {
+export class UpdateDocumentCountStep extends Step<MyContext> {
   readonly name = 'UpdateDocumentCount';
 
   async execute(
-    context: Readonly<UpdateDocumentCountContext>,
-    handlers: IHandlers<UpdateDocumentCountContext>,
-  ): Promise<
-    void | Step<UpdateDocumentCountContext>[] | Step<UpdateDocumentCountContext>
-  > {
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
+  ): Promise<void | Step<MyContext>[] | Step<MyContext>> {
     await simulateAsyncTask();
   }
 }

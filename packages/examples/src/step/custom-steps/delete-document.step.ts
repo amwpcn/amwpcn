@@ -1,10 +1,9 @@
-import { IContext, IStep, step } from '@amwpcn/step';
+import { IStep, step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { MyContext } from './common';
 import { updateDocumentCount } from './update-document-count.step';
 
-interface DeleteDocumentContext extends IContext {}
-
-const deleteDocumentStep: IStep<DeleteDocumentContext> & {
+const deleteDocumentStep: IStep<MyContext> & {
   myCustomDuration?: number;
   myCustomResult?: string;
 } = {

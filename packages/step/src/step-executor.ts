@@ -129,7 +129,7 @@ export class StepExecutor<C extends IContext> {
 
     // Preparations
     try {
-      await step.prepare(this._context.get());
+      await step.prepare(this._context.get(), this._handlers);
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'prepare', graphNode)) {
         return;
@@ -218,7 +218,7 @@ export class StepExecutor<C extends IContext> {
 
     // Wrapping up with final
     try {
-      await step.final(this._context.get());
+      await step.final(this._context.get(), this._handlers);
     } catch (error) {
       if (this._defaultErrorHandler(error, step.name, 'final', graphNode)) {
         return;
