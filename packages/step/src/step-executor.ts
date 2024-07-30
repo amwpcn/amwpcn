@@ -292,7 +292,7 @@ export class StepExecutor<C extends IContext> {
    * Handles error handling for a specific stage of a step during execution.
    *
    * @param error - The error that occurred during the execution.
-   * @param step - The name of the step where the error occurred.
+   * @param step - The step where the error occurred.
    * @param stage - The stage of the step where the error occurred (prepare, execute, final).
    * @returns A boolean indicating if the execution should continue.
    * If true, the execution will immediately stop, otherwise continue assuming the error was handled.
