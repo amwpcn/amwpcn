@@ -98,7 +98,11 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * Usage example: Select something from the database that you need for the executions of the current or children steps
    *
-   * @param context The shared context object.
+   * @param context The context required for the step execution. The `context` is passed
+   * when you create the StepExecutor instance and all the steps that run within
+   * the same StepExecutor will share this context. You can use it to share data between steps.
+   * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
+   * for example `handlers.stopImmediate()` will stop all the executions immediately.
    */
   async prepare(context: Readonly<C>, handlers: IHandlers<C>): Promise<void> {}
 
@@ -143,7 +147,11 @@ export abstract class Step<C extends IContext = IContext> {
    *
    * Usage example: Log information about the step
    *
-   * @param context The shared context object.
+   * @param context The context required for the step execution. The `context` is passed
+   * when you create the StepExecutor instance and all the steps that run within
+   * the same StepExecutor will share this context. You can use it to share data between steps.
+   * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
+   * for example `handlers.stopImmediate()` will stop all the executions immediately.
    */
   async final(context: Readonly<C>, handlers: IHandlers<C>): Promise<void> {}
 }
