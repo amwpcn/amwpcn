@@ -96,7 +96,7 @@ export class StepExecutor<C extends IContext> {
    */
   async start(): Promise<void> {
     // All the provided steps will start executing concurrently
-    await Promise.all([...this._steps.map((s) => this._start(s, {}))]);
+    await Promise.all(this._steps.map((s) => this._start(s, {})));
   }
 
   /**
