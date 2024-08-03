@@ -1,5 +1,17 @@
 # @amwpcn/step
 
+## 0.0.5
+
+### Patch Changes
+
+- 608e93a: - Contributing.md
+  - Example: Context data sharing
+  - Graph performance improvement
+  - Execution handlers to other stages (This will allow other stages to stop
+    execution or update context)
+  - Documentation update
+  - More tests
+
 ## 0.0.4
 
 ### Patch Changes
