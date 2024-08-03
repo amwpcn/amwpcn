@@ -1,6 +1,6 @@
 {
   "name": "@amwpcn/step",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A framework for defining and executing steps with hooks and concurrency management",
   "author": "Achintha Weerasinghe <achinthamadumal@gmail.com>",
   "license": "MIT",
