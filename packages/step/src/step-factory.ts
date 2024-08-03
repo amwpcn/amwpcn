@@ -31,12 +31,9 @@ export interface IStep<C extends IContext = IContext> {
    * If you change anything during the execution of the step, those changes will also appear here.
    * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
    * for example `handlers.stopImmediate()` will stop all the executions immediately.
-   * @returns A promise that resolves to void, an array of steps, or a single step.
+   * @returns A promise that resolves to void.
    */
-  rollback?(
-    context: Readonly<C>,
-    handlers: IHandlers<C>,
-  ): Promise<void | Step<C>[] | Step<C>>;
+  rollback?(context: Readonly<C>, handlers: IHandlers<C>): Promise<void>;
 
   /**
    * Use this function if you want to do any preparation at the beginning even before executing
@@ -50,7 +47,7 @@ export interface IStep<C extends IContext = IContext> {
    *     myCustomDuration?: number;
    *     myCustomResult?: string;
    *   } = {
-   *     async prepare(context) {
+   *     async prepare(context, handlers) {
    *       this.myCustomDuration = Math.round(Math.random() * 901 + 100);
    *     },
    *     async execute(context, handlers) {
@@ -61,7 +58,7 @@ export interface IStep<C extends IContext = IContext> {
    *
    *       return updateDocumentCount();
    *     },
-   *     async final(context) {
+   *     async final(context, handlers) {
    *       console.log(this.myCustomResult);
    *     },
    *   };
@@ -74,9 +71,13 @@ export interface IStep<C extends IContext = IContext> {
    *
    * Usage example: Select something from the database that you need for the executions of the current or children steps
    *
-   * @param context The shared context object.
+   * @param context The context required for the step execution. The `context` is passed
+   * when you create the StepExecutor instance and all the steps that run within
+   * the same StepExecutor will share this context. You can use it to share data between steps.
+   * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
+   * for example `handlers.stopImmediate()` will stop all the executions immediately.
    */
-  prepare?(context: Readonly<C>): Promise<void>;
+  prepare?(context: Readonly<C>, handlers: IHandlers<C>): Promise<void>;
 
   /**
    * This function will be called at the end even after the execution of steps in the after queue.
@@ -87,7 +88,7 @@ export interface IStep<C extends IContext = IContext> {
    *     myCustomDuration?: number;
    *     myCustomResult?: string;
    *   } = {
-   *     async prepare(context) {
+   *     async prepare(context, handlers) {
    *       this.myCustomDuration = Math.round(Math.random() * 901 + 100);
    *     },
    *     async execute(context, handlers) {
@@ -98,21 +99,25 @@ export interface IStep<C extends IContext = IContext> {
    *
    *       return updateDocumentCount();
    *     },
-   *     async final(context) {
+   *     async final(context, handlers) {
    *       console.log(this.myCustomResult);
    *     },
    *   };
    * ```
    *
-   * It's not recommended to use this step to do anything related your action logic.
+   * It's not recommended to use this step to do anything related to your action logic.
    * You could always create a new step and add it to the after queue with a priority as you need.
-   * Keep this only wrapping up.
+   * Keep this only for wrapping up.
    *
    * Usage example: Log information about the step
    *
-   * @param context The shared context object.
+   * @param context The context required for the step execution. The `context` is passed
+   * when you create the StepExecutor instance and all the steps that run within
+   * the same StepExecutor will share this context. You can use it to share data between steps.
+   * @param handlers The `handlers` contains some useful functions that you can use to handle the execution
+   * for example `handlers.stopImmediate()` will stop all the executions immediately.
    */
-  final?(context: Readonly<C>): Promise<void>;
+  final?(context: Readonly<C>, handlers: IHandlers<C>): Promise<void>;
 }
 
 class ConcreteStep<C extends IContext = IContext> extends Step<C> {

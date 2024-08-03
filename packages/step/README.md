@@ -15,6 +15,8 @@ before and after hooks, and concurrency management.
   - [Creating Steps](#creating-steps)
   - [Chaining Steps](#chaining-steps)
   - [Executing Steps](#executing-steps)
+  - [Updating Context](#updating-context)
+  - [Graphs](#graphs)
 - [API Reference](#api-reference)
   - [Step Class](#step-class)
   - [StepExecutor Class](#stepexecutor-class)
@@ -251,6 +253,22 @@ executor
 If you do not define error handlers, the default error handler will kick in and
 immediately log and stop the execution.
 
+### Updating Context
+
+Each stage handler (prepare, execute, final) will get `handlers` as the second
+parameter which contains some helpers to manage the execution. It has a helper
+called `contextUpdater`. Here is an example usage.
+
+```typescript
+handlers.contextUpdater((context) => ({
+  something: `${context.something}+Updated`,
+}));
+```
+
+Changes to the context will appear in the next stage and/or next steps starts
+executing. Parallel steps won't see the changes. This is to avoid any
+un-expected side effects.
+
 ### Graphs
 
 If you enable graphs for execution, nodes and edges required for generation of a
@@ -268,6 +286,31 @@ vis-network graph. We created this graph after mapping the returned data to
 vis-network.
 
 ![Step Example Graph](https://raw.githubusercontent.com/amwpcn/amwpcn/master/packages/examples/src/step/static/sample-vis-execution-graph.png)
+
+You could always check the examples in the repository. But here is the code we
+used to generate the above graph.
+
+```typescript
+const edges = executor.graphData.edges.map((e) => ({
+  from: e.from,
+  to: e.to,
+  label: e.queueOrder,
+  arrows: 'to',
+  smooth: {
+    type: 'dynamic',
+    roundness: 0.5,
+    forceDirection: 'none',
+  },
+  color: 'black',
+}));
+const nodes = executor.graphData.nodes.map((n) => ({
+  id: n.id,
+  label: n.label,
+  title: n.ancestors?.join(', '),
+  shape: 'box',
+  color: n.isError ? 'pink' : undefined,
+}));
+```
 
 ## API Reference
 

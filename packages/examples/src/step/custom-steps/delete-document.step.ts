@@ -1,14 +1,13 @@
-import { IContext, IStep, step } from '@amwpcn/step';
+import { IStep, step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { MyContext } from './common';
 import { updateDocumentCount } from './update-document-count.step';
 
-interface DeleteDocumentContext extends IContext {}
-
-const deleteDocumentStep: IStep<DeleteDocumentContext> & {
+const deleteDocumentStep: IStep<MyContext> & {
   myCustomDuration?: number;
   myCustomResult?: string;
 } = {
-  async prepare(context) {
+  async prepare(context, handlers) {
     this.myCustomDuration = Math.round(Math.random() * 901 + 100); // Random number between 100 - 1000
   },
   async execute(context, handlers) {
@@ -19,7 +18,7 @@ const deleteDocumentStep: IStep<DeleteDocumentContext> & {
 
     return updateDocumentCount();
   },
-  async final(context) {
+  async final(context, handlers) {
     console.log(this.myCustomResult);
   },
 };

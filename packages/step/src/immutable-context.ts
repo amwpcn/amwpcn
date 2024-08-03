@@ -2,7 +2,7 @@ export interface IContext {}
 
 export interface IHandlers<C extends IContext> {
   stopImmediate: () => void;
-  contextUpdater: (updater: (context: C) => Partial<C>) => void;
+  contextUpdater: (updater: (context: Readonly<C>) => Partial<C>) => void;
 }
 
 export class ImmutableContext<C extends IContext> {
@@ -16,7 +16,7 @@ export class ImmutableContext<C extends IContext> {
     return this._context;
   }
 
-  update(updater: (context: C) => Partial<C>): ImmutableContext<C> {
+  update(updater: (context: Readonly<C>) => Partial<C>): ImmutableContext<C> {
     const updates = updater({ ...this._context });
     const newContext = { ...this._context, ...updates };
     return new ImmutableContext(newContext);

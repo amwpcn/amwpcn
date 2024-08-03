@@ -1,20 +1,28 @@
 import { IContext, IHandlers, Step } from '@amwpcn/step';
 import { simulateAsyncTask } from '../helpers';
+import { MyContext } from './common';
 import { updateDocumentCount } from './update-document-count.step';
 
-interface ImportDocumentContext extends IContext {}
-
-export class ImportDocumentStep extends Step<ImportDocumentContext> {
+export class ImportDocumentStep extends Step<MyContext> {
   readonly name: string = 'ImportDocument';
 
   async execute(
-    context: Readonly<ImportDocumentContext>,
-    handlers: IHandlers<ImportDocumentContext>,
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
   ): Promise<void | Step<IContext>[] | Step<IContext>> {
     await simulateAsyncTask();
+    handlers.contextUpdater((context) => ({
+      something: `${context.something}+Updated`,
+    }));
 
-    // this.enqueueAfter(importDocument(), 0);
     return updateDocumentCount();
+  }
+
+  async final(
+    context: Readonly<MyContext>,
+    handlers: IHandlers<MyContext>,
+  ): Promise<void> {
+    console.log(context.something);
   }
 }
 

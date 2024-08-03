@@ -22,7 +22,7 @@ export interface GraphOptions {
 }
 
 export class Graph {
-  private _nodes: GraphNode[] = [];
+  private _nodes: Map<string, GraphNode> = new Map();
   private _edges: GraphEdge[] = [];
 
   constructor(private _options?: GraphOptions) {}
@@ -31,22 +31,28 @@ export class Graph {
     return this._options?.enable ?? false;
   }
 
-  addNode(node: GraphNode): GraphNode {
-    const existingNode = this._nodes.find((n) => n.id === node.id);
+  addNode(node: GraphNode): string {
+    const existingNode = this._nodes.get(node.id);
     if (existingNode) {
-      return existingNode;
+      return existingNode.id;
     }
 
-    this._nodes.push(node);
-    return node;
+    this._nodes.set(node.id, node);
+    return node.id;
   }
 
-  addEdge(edge: GraphEdge): GraphEdge {
+  addEdge(edge: GraphEdge): void {
     this._edges.push(edge);
-    return edge;
+  }
+
+  setError(id: string): void {
+    const node = this._nodes.get(id);
+    if (node) {
+      node.isError = true;
+    }
   }
 
   get data(): GraphData {
-    return { nodes: [...this._nodes], edges: [...this._edges] };
+    return { nodes: Array.from(this._nodes.values()), edges: [...this._edges] };
   }
 }
