@@ -9,15 +9,18 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "yarn clean && tsc",
-    "start": "yarn build && node dist/index"
+    "start:step": "yarn build && node dist/step/index.js",
+    "start:ds": "yarn build && node dist/data-structures/index.mjs"
   },
   "devDependencies": {
     "@types/express": "^4",
     "@types/node": "^20.14.11",
     "rimraf": "^6.0.1",
+    "tsx": "^4.19.1",
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "@amwpcn/data-structures": "workspace:^",
     "@amwpcn/step": "workspace:^",
     "express": "^4.19.2"
   }
