@@ -1,4 +1,4 @@
-export interface Tree<T> {
+export interface ITree<T> {
   preOrderTraverse(fn: TraverseCallback<T>): void;
   postOrderTraverse(fn: TraverseCallback<T>): void;
   inOrderTraverse(fn: TraverseCallback<T>): void;

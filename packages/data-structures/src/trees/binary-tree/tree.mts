@@ -1,7 +1,7 @@
-import { TraverseCallback, Tree } from '../common/index.mjs';
+import { ITree, TraverseCallback } from '../common/index.mjs';
 import { BinaryTreeNode } from './node.mjs';
 
-export class BinaryTree<T> implements Tree<T> {
+export class BinaryTree<T> implements ITree<T> {
   private _root?: BinaryTreeNode<T> | undefined;
 
   private readonly _comparer: NodeSelector<T>;
