@@ -18,3 +18,8 @@ console.log('Post-order traversal');
 tree.postOrderTraverse((data) => {
   console.log(data);
 });
+
+console.log('In-order traversal');
+tree.inOrderTraverse((data) => {
+  console.log(data);
+});

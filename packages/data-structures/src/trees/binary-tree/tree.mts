@@ -137,6 +137,36 @@ export class BinaryTree<T> implements Tree<T> {
 
     fn(root.data);
   }
+
+  /**
+   * Performs an in-order traversal of the binary tree starting from the root node.
+   * Executes the provided callback function on each node's data in the order: left, root, right.
+   *
+   * @typeparam T - The type of data stored in the tree nodes.
+   *
+   * @param fn The callback function to be executed on each node's data during traversal.
+   * @returns void
+   */
+  inOrderTraverse(fn: TraverseCallback<T>): void {
+    if (this._root) {
+      this._inOrderTraverseRecursive(fn, this._root);
+    }
+  }
+
+  private _inOrderTraverseRecursive(
+    fn: TraverseCallback<T>,
+    root: BinaryTreeNode<T>,
+  ): void {
+    if (root.left) {
+      this._inOrderTraverseRecursive(fn, root.left);
+    }
+
+    fn(root.data);
+
+    if (root.right) {
+      this._inOrderTraverseRecursive(fn, root.right);
+    }
+  }
 }
 
 export interface NodeSelector<T> {
