@@ -1,4 +1,4 @@
-import { Node } from '../common/index.mjs';
+import { Node } from '../../common/index.mjs';
 
 export class BinaryTreeNode<T> extends Node<T> {
   private _left?: BinaryTreeNode<T>;
