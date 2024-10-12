@@ -24,7 +24,7 @@ export class BinaryTree<T> implements Tree<T> {
    *
    * @returns The root node of the binary tree, or undefined if the tree is empty.
    */
-  root(): BinaryTreeNode<T> | undefined {
+  get root(): BinaryTreeNode<T> | undefined {
     return this._root;
   }
 
@@ -33,7 +33,7 @@ export class BinaryTree<T> implements Tree<T> {
    *
    * @returns True if the tree is empty, false otherwise.
    */
-  empty(): boolean {
+  get empty(): boolean {
     return this._root === undefined;
   }
 
@@ -59,20 +59,18 @@ export class BinaryTree<T> implements Tree<T> {
     node: BinaryTreeNode<T>,
     root: BinaryTreeNode<T>,
   ): BinaryTreeNode<T> {
-    const value = this._comparer(root.data(), node.data());
+    const value = this._comparer(root.data, node.data);
 
     if (value < 0) {
-      const left = root.left();
-      if (left) {
-        return this._insertRecursive(node, left);
+      if (root.left) {
+        return this._insertRecursive(node, root.left);
       }
       return root.setLeft(node);
     }
 
     if (value > 0) {
-      const right = root.right();
-      if (right) {
-        return this._insertRecursive(node, right);
+      if (root.right) {
+        return this._insertRecursive(node, root.right);
       }
       return root.setRight(node);
     }
@@ -80,6 +78,15 @@ export class BinaryTree<T> implements Tree<T> {
     throw new Error('Node already exists');
   }
 
+  /**
+   * Performs a pre-order traversal of the binary tree starting from the root node.
+   * Executes the provided callback function on each node's data in the order: root, left, right.
+   *
+   * @typeparam T - The type of data stored in the tree nodes.
+   *
+   * @param fn The callback function to be executed on each node's data during traversal.
+   * @returns void
+   */
   preOrderTraverse(fn: TraverseCallback<T>): void {
     if (this._root) {
       this._preOrderTraverseRecursive(fn, this._root);
@@ -90,19 +97,26 @@ export class BinaryTree<T> implements Tree<T> {
     fn: TraverseCallback<T>,
     root: BinaryTreeNode<T>,
   ): void {
-    const left = root.left();
-    if (left) {
-      this._preOrderTraverseRecursive(fn, left);
+    fn(root.data);
+
+    if (root.left) {
+      this._preOrderTraverseRecursive(fn, root.left);
     }
 
-    fn(root.data());
-
-    const right = root.right();
-    if (right) {
-      this._preOrderTraverseRecursive(fn, right);
+    if (root.right) {
+      this._preOrderTraverseRecursive(fn, root.right);
     }
   }
 
+  /**
+   * Performs a post-order traversal of the binary tree starting from the root node.
+   * Executes the provided callback function on each node's data in the order: left, right, root.
+   *
+   * @typeparam T - The type of data stored in the tree nodes.
+   *
+   * @param fn The callback function to be executed on each node's data during traversal.
+   * @returns void
+   */
   postOrderTraverse(fn: TraverseCallback<T>): void {
     if (this._root) {
       this._postOrderTraverseRecursive(fn, this._root);
@@ -113,17 +127,15 @@ export class BinaryTree<T> implements Tree<T> {
     fn: TraverseCallback<T>,
     root: BinaryTreeNode<T>,
   ): void {
-    const right = root.right();
-    if (right) {
-      this._postOrderTraverseRecursive(fn, right);
+    if (root.left) {
+      this._postOrderTraverseRecursive(fn, root.left);
     }
 
-    fn(root.data());
-
-    const left = root.left();
-    if (left) {
-      this._postOrderTraverseRecursive(fn, left);
+    if (root.right) {
+      this._postOrderTraverseRecursive(fn, root.right);
     }
+
+    fn(root.data);
   }
 }
 

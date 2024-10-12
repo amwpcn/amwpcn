@@ -8,11 +8,11 @@ export class BinaryTreeNode<T> extends Node<T> {
     super(data);
   }
 
-  left(): BinaryTreeNode<T> | undefined {
+  get left(): BinaryTreeNode<T> | undefined {
     return this._left;
   }
 
-  right(): BinaryTreeNode<T> | undefined {
+  get right(): BinaryTreeNode<T> | undefined {
     return this._right;
   }
 

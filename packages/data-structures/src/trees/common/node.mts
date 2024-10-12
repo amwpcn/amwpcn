@@ -7,7 +7,7 @@ export class Node<T> implements INode {
     this._data = data;
   }
 
-  data(): T {
+  get data(): T {
     return this._data;
   }
 
