@@ -16,14 +16,19 @@ export class Queue<T> implements IQueue<T> {
     this._arr = new Array<QueueNode<T>>(this._maxSize);
   }
 
+  /**
+   * Returns a boolean value indicating whether the queue is empty.
+   */
   get empty(): boolean {
     return this._size === 0;
   }
 
   /**
-   * Represents a queue data structure that implements the IQueue interface.
+   * Adds the provided data to the queue.
+   * If the queue is full, it doubles its capacity before adding the data.
    *
-   * @template T - The type of elements stored in the queue.
+   * @param data - The data to be added to the queue.
+   * @returns void
    */
   enqueue(data: T): void {
     if (this._size === this._maxSize) {
@@ -35,7 +40,7 @@ export class Queue<T> implements IQueue<T> {
     this._size++;
   }
 
-  private _doubleIt() {
+  private _doubleIt(): void {
     this._maxSize *= 2;
     const tempArr = new Array<QueueNode<T>>(this._maxSize);
 
@@ -48,6 +53,12 @@ export class Queue<T> implements IQueue<T> {
     this._arr = tempArr;
   }
 
+  /**
+   * Removes and returns the front element of the queue.
+   * If the queue is empty, throws an error.
+   *
+   * @returns The data of the front element that was removed.
+   */
   dequeue(): T {
     if (this._size === 0) {
       throw new Error('Queue is empty');
@@ -59,6 +70,12 @@ export class Queue<T> implements IQueue<T> {
     return data;
   }
 
+  /**
+   * Returns the data of the front element of the queue without removing it.
+   * If the queue is empty, throws an error.
+   *
+   * @returns The data of the front element of the queue.
+   */
   peak(): T {
     if (this._size === 0) {
       throw new Error('Queue is empty');
@@ -67,6 +84,13 @@ export class Queue<T> implements IQueue<T> {
     return this._arr[this._front].data;
   }
 
+  /**
+   * Returns a string representation of the elements in the queue.
+   * It creates a temporary array to store the elements in the correct order,
+   * then joins them with a separator and includes the current size of the queue.
+   *
+   * @returns A string representing the elements in the queue and its size.
+   */
   toString(): string {
     const tempArr = new Array<T>(this._maxSize);
     for (let i = 0; i < this._size; i++) {
