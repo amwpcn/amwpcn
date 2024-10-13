@@ -1,3 +1,4 @@
+import { Queue } from '../../queue/simple/index.mjs';
 import { ITree, TraverseCallback } from '../common/index.mjs';
 import { BinaryTreeNode } from './node.mjs';
 
@@ -166,6 +167,46 @@ export class BinaryTree<T> implements ITree<T> {
     if (root.right) {
       this._inOrderTraverseRecursive(fn, root.right);
     }
+  }
+
+  /**
+   * Performs a level-order traversal of the binary tree starting from the root node.
+   * Executes the provided callback function on each node's data in a breadth-first manner.
+   *
+   * @typeparam T - The type of data stored in the tree nodes.
+   *
+   * @param fn The callback function to be executed on each node's data during traversal.
+   * @returns void
+   */
+  levelOrderTraverse(fn: TraverseCallback<T>): void {
+    const queue = new Queue<BinaryTreeNode<T>>(4);
+
+    if (this._root) {
+      queue.enqueue(this._root);
+      this._levelOrderTraverseRecursive(fn, queue);
+    }
+  }
+
+  private _levelOrderTraverseRecursive(
+    fn: TraverseCallback<T>,
+    queue: Queue<BinaryTreeNode<T>>,
+  ): void {
+    if (queue.empty) {
+      return;
+    }
+
+    const node = queue.dequeue();
+    fn(node.data);
+
+    if (node.left) {
+      queue.enqueue(node.left);
+    }
+
+    if (node.right) {
+      queue.enqueue(node.right);
+    }
+
+    this._levelOrderTraverseRecursive(fn, queue);
   }
 }
 
